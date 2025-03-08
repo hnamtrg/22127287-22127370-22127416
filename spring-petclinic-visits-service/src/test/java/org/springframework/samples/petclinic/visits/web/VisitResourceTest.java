@@ -1,4 +1,6 @@
 package org.springframework.samples.petclinic.visits.web;
+import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,4 +60,17 @@ class VisitResourceTest {
             .andExpect(jsonPath("$.items[1].petId").value(222))
             .andExpect(jsonPath("$.items[2].petId").value(222));
     }
+    @Test
+    void shouldBuildVisitCorrectly() {
+        Visit visit = Visit.VisitBuilder.aVisit()
+            .id(1)
+            .petId(111)
+            .description("Checkup")
+            .build();
+
+        assertThat(visit.getId()).isEqualTo(1);
+        assertThat(visit.getPetId()).isEqualTo(111);
+        assertThat(visit.getDescription()).isEqualTo("Checkup");
+    }
+
 }
