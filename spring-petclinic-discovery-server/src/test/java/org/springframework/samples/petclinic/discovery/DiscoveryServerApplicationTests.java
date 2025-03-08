@@ -15,8 +15,14 @@
  */
 package org.springframework.samples.petclinic.discovery;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootTest
 class DiscoveryServerApplicationTests {
@@ -25,4 +31,16 @@ class DiscoveryServerApplicationTests {
 	void contextLoads() {
 	}
 
+	 @Test
+    void testMainMethod() {
+        // Mock SpringApplication.run
+        try (var mockedStatic = mockStatic(SpringApplication.class)) {
+            mockedStatic.when(() -> SpringApplication.run(DiscoveryServerApplication.class, new String[]{}))
+                        .thenReturn(mock(ConfigurableApplicationContext.class));
+
+            DiscoveryServerApplication.main(new String[]{});
+
+            mockedStatic.verify(() -> SpringApplication.run(DiscoveryServerApplication.class, new String[]{}), times(1));
+        }
+    }
 }
