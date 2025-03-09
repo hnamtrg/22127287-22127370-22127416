@@ -87,7 +87,7 @@ pipeline {
     }
     post {
         always {
-            node { label '22127287-22127416-22127370' } {
+            node('22127287-22127416-22127370') {
                 script {
                     if (currentBuild.result == 'SUCCESS' || currentBuild.result == null) {
                         notifyGitHub("success", "ci/jenkins", "Build and tests passed successfully for changed services.")
