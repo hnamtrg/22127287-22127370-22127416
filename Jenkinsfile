@@ -1,4 +1,3 @@
-// Định nghĩa hàm ở cấp cao nhất
 def get_service_name(file_path) {
     def parts = file_path.split('/')
     if (parts.size() < 1) {
@@ -50,6 +49,23 @@ pipeline {
                             sh "mvn clean test"
                             sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
                             archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+                        }
+                    }
+                }
+            }
+        }
+        stage('Build') {
+            when {
+                expression { env.CHANGED_SERVICES != '' }
+            }
+            steps {
+                script {
+                    def services = env.CHANGED_SERVICES.split(',')
+                    services.each { service ->
+                        echo "Building service without tests: ${service}"
+                        dir("spring-petclinic-${service}") {
+                            sh "mvn clean package -DskipTests"
+                            archiveArtifacts artifacts: "target/*.jar", allowEmptyArchive: false
                         }
                     }
                 }
