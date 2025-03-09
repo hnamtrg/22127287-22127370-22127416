@@ -11,7 +11,6 @@ pipeline {
                 checkout scm
             }
         }
-
         stage('Check Changes') {
             steps {
                 script {
