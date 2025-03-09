@@ -13,7 +13,6 @@ spring:
 eureka:
   client:
     enabled: false
-
 vets:
   cache:
     ttl: 10
