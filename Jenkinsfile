@@ -3,7 +3,7 @@
 pipeline {
     agent { label '22127287-22127416-22127370' }
     environment {
-        GITHUB_TOKEN = credentials('github-token')
+        GITHUB_TOKEN = credentials('jenkins')
     }
     stages {
         stage('Checkout') {
