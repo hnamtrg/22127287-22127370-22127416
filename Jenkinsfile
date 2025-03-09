@@ -113,7 +113,7 @@ def getChangedServices() {
 
 def notifyGitHub(String state, String context, String description) {
     def commitSha = env.GIT_COMMIT
-    def repoUrl = "https://api.github.com/repos/YOUR_USERNAME/spring-petclinic-microservices/statuses/${commitSha}"
+    def repoUrl = "https://api.github.com/repos/hnamtrg/22127287-22127370-22127416/statuses/${commitSha}"
     def buildUrl = "${env.BUILD_URL}"
     def payload = """{
         "state": "${state}",
