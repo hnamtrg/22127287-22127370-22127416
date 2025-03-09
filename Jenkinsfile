@@ -9,6 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                sh "git fetch origin main"
             }
         }
         stage('Check Changes') {
@@ -100,7 +101,7 @@ pipeline {
 }
 
 def getChangedServices() {
-    def baseBranch = env.CHANGE_TARGET ?: 'main'
+    def baseBranch = env.CHANGE_TARGET ?: 'main' // Giữ main vì repo có nhánh main
     def changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${baseBranch} HEAD").trim().split("\n")
     def services = []
     def serviceDirs = ["spring-petclinic-config-server", "spring-petclinic-discovery-server", "spring-petclinic-vets-service", "spring-petclinic-customers-service", "spring-petclinic-visits-service", "spring-petclinic-apigateway", "spring-petclinic-genai-service", "spring-petclinic-ui"]
@@ -125,6 +126,7 @@ def notifyGitHub(String state, String context, String description) {
         "description": "${description}",
         "context": "${context}"
     }"""
+    echo "Sending GitHub status: ${state} with token ${env.GITHUB_TOKEN ? 'present' : 'null'}"
     sh """
         curl -X POST \
         -H "Authorization: token ${env.GITHUB_TOKEN}" \
