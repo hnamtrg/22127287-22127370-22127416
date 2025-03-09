@@ -33,6 +33,25 @@ pipeline {
                     }
                     services = services.unique()
                     echo "Services with changes: ${services.join(', ')}"
+                    env.CHANGED_SERVICES = services.join(',')
+                }
+            }
+        }
+        stage('Test and Coverage') {
+            when {
+                expression { env.CHANGED_SERVICES != '' }
+            }
+            steps {
+                script {
+                    def services = env.CHANGED_SERVICES.split(',')
+                    services.each { service ->
+                        echo "Running tests for service: ${service}"
+                        dir("spring-petclinic-${service}") {
+                            sh "mvn clean test"
+                            sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
+                            archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+                        }
+                    }
                 }
             }
         }
