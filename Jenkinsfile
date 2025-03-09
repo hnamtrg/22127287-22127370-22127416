@@ -20,7 +20,9 @@ pipeline {
                         echo "No changes detected in service directories. Skipping pipeline."
                         currentBuild.result = 'SUCCESS'
                         notifyGitHub("success", "ci/jenkins", "No changes in services, pipeline skipped.")
-                        return
+                        return // Thoát pipeline ngay sau khi gửi trạng thái
+                    } else {
+                        echo "Changed services detected: ${changedServices}"
                     }
                 }
             }
@@ -39,7 +41,7 @@ pipeline {
                                 echo "Running tests for ${service}"
                                 sh "mvn test"
                                 sh "mvn jacoco:report"
-                                sh "if [ -d target/surefire-reports ]; then zip -r test-results.zip target/surefire-reports/; fi"
+                                sh "if [ -d target/surefire-reports ]; then zip -r test-results.zip target/surefire-reports/; else echo 'No test results to zip'; fi"
                                 archiveArtifacts artifacts: 'target/surefire-reports/*.xml', allowEmptyArchive: true
                                 archiveArtifacts artifacts: 'target/site/jacoco/**', allowEmptyArchive: true
                                 archiveArtifacts artifacts: 'test-results.zip', allowEmptyArchive: true
@@ -52,6 +54,7 @@ pipeline {
                                 )
                             } catch (Exception e) {
                                 echo "Tests failed for ${service}: ${e.message}"
+                                currentBuild.result = 'FAILURE' // Đánh dấu pipeline thất bại nếu test lỗi
                             }
                         }
                     }
@@ -74,6 +77,7 @@ pipeline {
                                 archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
                             } catch (Exception e) {
                                 echo "Build failed for ${service}: ${e.message}"
+                                currentBuild.result = 'FAILURE' // Đánh dấu pipeline thất bại nếu build lỗi
                             }
                         }
                     }
@@ -82,14 +86,15 @@ pipeline {
         }
     }
     post {
-        success {
-            script {
-                notifyGitHub("success", "ci/jenkins", "Build and tests passed successfully for changed services.")
-            }
-        }
-        failure {
-            script {
-                notifyGitHub("failure", "ci/jenkins", "Build or tests failed for changed services.")
+        always {
+            node { // Thêm node để cung cấp context cho sh trong notifyGitHub
+                script {
+                    if (currentBuild.result == 'SUCCESS' || currentBuild.result == null) {
+                        notifyGitHub("success", "ci/jenkins", "Build and tests passed successfully for changed services.")
+                    } else {
+                        notifyGitHub("failure", "ci/jenkins", "Build or tests failed for changed services.")
+                    }
+                }
             }
         }
     }
