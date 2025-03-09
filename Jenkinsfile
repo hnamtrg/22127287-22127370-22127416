@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                sh "git fetch origin main"
+                sh "git fetch origin main:refs/remotes/origin/main" // Fetch main vào origin/main
             }
         }
         stage('Check Changes') {
@@ -19,7 +19,6 @@ pipeline {
                     if (changedServices.isEmpty()) {
                         echo "No changes detected in service directories. Skipping pipeline."
                         currentBuild.result = 'SUCCESS'
-                        notifyGitHub("success", "ci/jenkins", "No changes in services, pipeline skipped.")
                         return
                     } else {
                         echo "Changed services detected: ${changedServices}"
@@ -85,23 +84,10 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            node('22127287-22127416-22127370') {
-                script {
-                    if (currentBuild.result == 'SUCCESS' || currentBuild.result == null) {
-                        notifyGitHub("success", "ci/jenkins", "Build and tests passed successfully for changed services.")
-                    } else {
-                        notifyGitHub("failure", "ci/jenkins", "Build or tests failed for changed services.")
-                    }
-                }
-            }
-        }
-    }
 }
 
 def getChangedServices() {
-    def baseBranch = env.CHANGE_TARGET ?: 'main' // Giữ main vì repo có nhánh main
+    def baseBranch = env.CHANGE_TARGET ?: 'main'
     def changedFiles = sh(returnStdout: true, script: "git diff --name-only origin/${baseBranch} HEAD").trim().split("\n")
     def services = []
     def serviceDirs = ["spring-petclinic-config-server", "spring-petclinic-discovery-server", "spring-petclinic-vets-service", "spring-petclinic-customers-service", "spring-petclinic-visits-service", "spring-petclinic-apigateway", "spring-petclinic-genai-service", "spring-petclinic-ui"]
@@ -114,24 +100,4 @@ def getChangedServices() {
         }
     }
     return services.unique()
-}
-
-def notifyGitHub(String state, String context, String description) {
-    def commitSha = env.GIT_COMMIT
-    def repoUrl = "https://api.github.com/repos/hnamtrg/22127287-22127370-22127416/statuses/${commitSha}"
-    def buildUrl = "${env.BUILD_URL}"
-    def payload = """{
-        "state": "${state}",
-        "target_url": "${buildUrl}",
-        "description": "${description}",
-        "context": "${context}"
-    }"""
-    echo "Sending GitHub status: ${state} with token ${env.GITHUB_TOKEN ? 'present' : 'null'}"
-    sh """
-        curl -X POST \
-        -H "Authorization: token ${env.GITHUB_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d '${payload}' \
-        "${repoUrl}"
-    """
 }
