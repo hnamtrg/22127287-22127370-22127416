@@ -9,6 +9,9 @@ public class OwnerEntityMapper implements Mapper<OwnerRequest, Owner> {
     // This is done by hand for simplicity purpose. In a real life use-case we should consider using MapStruct.
     @Override
     public Owner map(final Owner owner, final OwnerRequest request) {
+        if (owner == null || request == null) {
+            throw new NullPointerException("Owner or request cannot be null");
+        }
         owner.setAddress(request.address());
         owner.setCity(request.city());
         owner.setTelephone(request.telephone());
