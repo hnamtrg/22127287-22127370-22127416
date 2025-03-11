@@ -12,7 +12,7 @@ def get_service_name(file_path) {
 }
 
 pipeline {
-    agent { label '22127287-22127416-22127370' }
+    agent any
     stages {
         stage('Checkout') {
             steps {
@@ -46,9 +46,11 @@ pipeline {
                     services.each { service ->
                         echo "Running tests for service: ${service}"
                         dir("spring-petclinic-${service}") {
+                            // Chạy test và tạo báo cáo JaCoCo
                             sh "mvn clean test"
+                            // Nén kết quả test và coverage
                             sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
-                            archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+                            // archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
 
                             if (!fileExists("target/site/jacoco/jacoco.xml")) {
                                 error("JaCoCo report file (jacoco.xml) not found!")
@@ -90,13 +92,13 @@ pipeline {
 
 def parseJacocoCoverage(String xmlContent) {
     def coverage = [:]
-    def xml = new XmlSlurper().parseText(xmlContent)
     def totalMissed = 0.0
     def totalCovered = 0.0
 
-    xml.'**'.findAll { it.name() == 'counter' && it.@type == 'INSTRUCTION' }.each { counter ->
-        totalMissed += counter.@missed.toFloat()
-        totalCovered += counter.@covered.toFloat()
+    def instructionCounters = (xmlContent =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
+    instructionCounters.each { match ->
+        totalMissed += match[1].toFloat()
+        totalCovered += match[2].toFloat()
     }
 
     coverage.instruction = totalCovered / (totalMissed + totalCovered)
