@@ -12,7 +12,7 @@ def get_service_name(file_path) {
 }
 
 pipeline {
-    agent any
+    agent { label '22127287-22127416-22127370' }
     stages {
         stage('Checkout') {
             steps {
@@ -46,30 +46,61 @@ pipeline {
                     services.each { service ->
                         echo "Running tests for service: ${service}"
                         dir("spring-petclinic-${service}") {
+                            // Chạy test và tạo báo cáo JaCoCo
                             sh "mvn clean test"
+                            // Nén kết quả test và coverage
                             sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
-                            archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+                            // archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+
+                            if (!fileExists("target/site/jacoco/jacoco.xml")) {
+                                error("JaCoCo report file (jacoco.xml) not found!")
+                            }
+                            def jacocoXml = readFile(file: "target/site/jacoco/jacoco.xml")
+                            def coverage = parseJacocoCoverage(jacocoXml)
+
+                            def minCoverage = 0.70
+                            def totalInstructionCoverage = coverage.instruction
+                            if (totalInstructionCoverage >= minCoverage) {
+                                echo "Test coverage is sufficient! Instruction Coverage: ${totalInstructionCoverage*100}%"
+                            } else {
+                                error("Test coverage is insufficient! Required: 70%, Got: ${totalInstructionCoverage*100}%")
+                            }
                         }
                     }
                 }
             }
         }
-        stage('Build') {
-            when {
-                expression { env.CHANGED_SERVICES != '' }
-            }
-            steps {
-                script {
-                    def services = env.CHANGED_SERVICES.split(',')
-                    services.each { service ->
-                        echo "Building service without tests: ${service}"
-                        dir("spring-petclinic-${service}") {
-                            sh "mvn clean package -DskipTests"
-                            archiveArtifacts artifacts: "target/*.jar", allowEmptyArchive: false
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Build') {
+        //     when {
+        //         expression { env.CHANGED_SERVICES != '' }
+        //     }
+        //     steps {
+        //         script {
+        //             def services = env.CHANGED_SERVICES.split(',')
+        //             services.each { service ->
+        //                 echo "Building service without tests: ${service}"
+        //                 dir("spring-petclinic-${service}") {
+        //                     sh "mvn clean package -DskipTests"
+        //                     archiveArtifacts artifacts: "target/*.jar", allowEmptyArchive: false
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
+}
+
+def parseJacocoCoverage(String xmlContent) {
+    def coverage = [:]
+    def totalMissed = 0.0
+    def totalCovered = 0.0
+
+    def instructionCounters = (xmlContent =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
+    instructionCounters.each { match ->
+        totalMissed += match[1].toFloat()
+        totalCovered += match[2].toFloat()
+    }
+
+    coverage.instruction = totalCovered / (totalMissed + totalCovered)
+    return coverage
 }
