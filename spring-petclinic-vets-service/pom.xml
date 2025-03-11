@@ -7,7 +7,6 @@
 	<packaging>jar</packaging>
 	<description>Spring PetClinic Vets Service</description>
 
-
     
 	<parent>
 		<groupId>org.springframework.samples</groupId>
