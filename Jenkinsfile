@@ -12,7 +12,7 @@ def get_service_name(file_path) {
 }
 
 pipeline {
-    agent any
+    agent { label '22127287-22127416-22127370' }
     stages {
         stage('Checkout') {
             steps {
