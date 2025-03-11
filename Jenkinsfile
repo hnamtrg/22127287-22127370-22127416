@@ -11,8 +11,23 @@ def get_service_name(file_path) {
     }
 }
 
+def parseJacocoCoverage(String xmlContent) {
+    def coverage = [:]
+    def totalMissed = 0.0
+    def totalCovered = 0.0
+
+    def instructionCounters = (xmlContent =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
+    instructionCounters.each { match ->
+        totalMissed += match[1].toFloat()
+        totalCovered += match[2].toFloat()
+    }
+
+    coverage.instruction = totalCovered / (totalMissed + totalCovered)
+    return coverage
+}
+
 pipeline {
-    agent any
+    agent { label '22127287-22127416-22127370' }
     stages {
         stage('Checkout') {
             steps {
@@ -49,6 +64,20 @@ pipeline {
                             sh "mvn clean test"
                             sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
                             archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+
+                            if (!fileExists("target/site/jacoco/jacoco.xml")) {
+                                error("JaCoCo report file (jacoco.xml) not found!")
+                            }
+                            def jacocoXml = readFile(file: "target/site/jacoco/jacoco.xml")
+                            def coverage = parseJacocoCoverage(jacocoXml)
+
+                            def minCoverage = 0.70
+                            def totalInstructionCoverage = coverage.instruction
+                            if (totalInstructionCoverage >= minCoverage) {
+                                echo "Test coverage is sufficient! Instruction Coverage: ${totalInstructionCoverage*100}%"
+                            } else {
+                                error("Test coverage is insufficient! Required: 70%, Got: ${totalInstructionCoverage*100}%")
+                            }
                         }
                     }
                 }
