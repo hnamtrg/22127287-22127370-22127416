@@ -84,16 +84,25 @@ public class Owner {
         pet.setOwner(this);
     }
 
+    // @Override
+    // public String toString() {
+    //     return new ToStringCreator(this)
+    //         .append("id", this.getId())
+    //         .append("lastName", this.getLastName())
+    //         .append("firstName", this.getFirstName())
+    //         .append("address", this.address)
+    //         .append("city", this.city)
+    //         .append("telephone", this.telephone)
+    //         .toString();
+    // }
     @Override
     public String toString() {
-        return new ToStringCreator(this)
-            .append("id", this.getId())
-            .append("lastName", this.getLastName())
-            .append("firstName", this.getFirstName())
-            .append("address", this.address)
-            .append("city", this.city)
-            .append("telephone", this.telephone)
-            .toString();
+        return "[id=" + (this.getId() == null ? "null" : this.getId()) +
+            ", lastName=" + (this.getLastName() == null ? "null" : this.getLastName()) +
+            ", firstName=" + (this.getFirstName() == null ? "null" : this.getFirstName()) +
+            ", address=" + (this.address == null ? "null" : this.address) +
+            ", city=" + (this.city == null ? "null" : this.city) +
+            ", telephone=" + (this.telephone == null ? "null" : this.telephone) + "]";
     }
 
     public Integer getId() {
@@ -118,6 +127,10 @@ public class Owner {
 
     public String getTelephone() {
         return this.telephone;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setFirstName(String firstName) {
