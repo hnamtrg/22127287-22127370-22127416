@@ -61,7 +61,7 @@ pipeline {
                     services.each { service ->
                         echo "Running tests for service: ${service}"
                         dir("spring-petclinic-${service}") {
-                            sh "mvn clean test"
+                            sh "mvn clean test jacoco:report"
                             sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
                             archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
 
