@@ -7,6 +7,7 @@
 	<packaging>jar</packaging>
 	<description>Spring PetClinic Generative AI Service</description>
 
+    
 	<parent>
 		<groupId>org.springframework.samples</groupId>
 		<artifactId>spring-petclinic-microservices</artifactId>
