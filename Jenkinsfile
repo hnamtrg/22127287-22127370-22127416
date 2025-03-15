@@ -28,6 +28,9 @@ def parseJacocoCoverage(String xmlContent) {
 
 pipeline {
     agent { label '22127287-22127416-22127370' }
+    environment {
+        TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(4)}"
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -62,8 +65,9 @@ pipeline {
                         echo "Running tests for service: ${service}"
                         dir("spring-petclinic-${service}") {
                             sh "mvn clean test jacoco:report"
-                            sh "zip -r ${service}-test-results.zip target/surefire-reports/ target/site/jacoco/"
-                            archiveArtifacts artifacts: "${service}-test-results.zip", allowEmptyArchive: false
+                            def testResultsZip = "${service}-test-results-${env.TAG_NAME}.zip"
+                            sh "zip -r ${testResultsZip} target/surefire-reports/ target/site/jacoco/"
+                            archiveArtifacts artifacts: "${testResultsZip}", allowEmptyArchive: false
 
                             if (!fileExists("target/site/jacoco/jacoco.xml")) {
                                 error("JaCoCo report file (jacoco.xml) not found!")
@@ -94,7 +98,9 @@ pipeline {
                         echo "Building service without tests: ${service}"
                         dir("spring-petclinic-${service}") {
                             sh "mvn clean package -DskipTests"
-                            archiveArtifacts artifacts: "target/*.jar", allowEmptyArchive: false
+                            def artifactName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
+                            sh "mv target/spring-petclinic-${service}-*.jar target/${artifactName}
+                            archiveArtifacts artifacts: "target/${artifactName}", allowEmptyArchive: false
                         }
                     }
                 }
