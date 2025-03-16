@@ -99,7 +99,7 @@ pipeline {
                         dir("spring-petclinic-${service}") {
                             sh "mvn clean package -DskipTests"
                             def artifactName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
-                            sh "mv target/spring-petclinic-${service}-*.jar target/${artifactName}
+                            sh "mv target/spring-petclinic-${service}-*.jar target/${artifactName}"
                             archiveArtifacts artifacts: "target/${artifactName}", allowEmptyArchive: false
                         }
                     }
