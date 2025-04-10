@@ -1,38 +1,38 @@
 namespace: petclinic-dev
 services:
   config-server:
-    image: spring-petclinic-config-server-main
+    image: config-server
     tag: latest
     port: 8888
-  customers-service:
-    image: spring-petclinic-customers-service-main
-    tag: latest
-    port: 8081
   discovery-server:
-    image: spring-petclinic-discovery-server-main
+    image: discovery-server
     tag: latest
     port: 8761
+  customers-service:
+    image: customers-service
+    tag: latest
+    port: 8081
   visits-service:
-    image: spring-petclinic-visits-service-main
+    image: visits-service
     tag: latest
     port: 8082
   vets-service:
-    image: spring-petclinic-vets-service-main
+    image: vets-service
     tag: latest
     port: 8083
   genai-service:
-    image: spring-petclinic-genai-service-main
+    image: genai-service
     tag: latest
     port: 8084
   api-gateway:
-    image: spring-petclinic-api-gateway-main
+    image: api-gateway
     tag: latest
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
-    image: spring-petclinic-admin-server-main
+    image: admin-server
     tag: latest
     port: 9090
 replicaCount: 1
