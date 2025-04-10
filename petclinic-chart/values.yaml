@@ -1,38 +1,38 @@
 namespace: petclinic-dev
 services:
   config-server:
-    image: spring-petclinic-config-server-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-config-server-main
     port: 8888
   customers-service:
-    image: spring-petclinic-customers-service-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-customers-service-main
     port: 8081
   discovery-server:
-    image: spring-petclinic-discovery-server-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-discovery-server-main
     port: 8761
   visits-service:
-    image: spring-petclinic-visits-service-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-visits-service-main
     port: 8082
   vets-service:
-    image: spring-petclinic-vets-service-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-vets-service-main
     port: 8083
   genai-service:
-    image: spring-petclinic-genai-service-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-genai-service-main
     port: 8084
   api-gateway:
-    image: spring-petclinic-api-gateway-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-api-gateway-main
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
-    image: spring-petclinic-admin-server-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-admin-server-main
     port: 9090
 replicaCount: 1
