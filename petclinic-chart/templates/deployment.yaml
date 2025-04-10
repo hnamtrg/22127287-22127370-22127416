@@ -1,0 +1,26 @@
+{{- range $name, $config := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-petclinic-{{ $name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app: spring-petclinic-{{ $name }}
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: spring-petclinic-{{ $name }}
+  template:
+    metadata:
+      labels:
+        app: spring-petclinic-{{ $name }}
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: {{ $config.image }}:{{ $config.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ $config.port }}
+{{- end }}
