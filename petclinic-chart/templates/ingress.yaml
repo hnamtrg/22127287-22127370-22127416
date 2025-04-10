@@ -1,13 +1,13 @@
 {{- range $name, $config := .Values.services }}
-{{- if and (eq $name "api-gateway") $config.ingress.enabled }}
+{{- if $config.ingress.enabled }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: spring-petclinic-{{ $name }}-ingress
+  name: {{ $config.containerName }}-ingress 
   namespace: {{ $.Values.namespace }}
   labels:
-    name: spring-petclinic-{{ $name }}-ingress
+    name: {{ $config.containerName }}-ingress
 spec:
   rules:
   - host: {{ $config.ingress.host }}
@@ -17,7 +17,7 @@ spec:
         path: "/"
         backend:
           service:
-            name: spring-petclinic-{{ $name }}
+            name: {{ $config.containerName }}
             port:
               number: {{ $config.port }}
 {{- end }}

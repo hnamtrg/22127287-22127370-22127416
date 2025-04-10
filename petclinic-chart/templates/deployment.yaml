@@ -3,23 +3,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-petclinic-{{ $name }}
+  name: {{ $config.containerName }}
   namespace: {{ $.Values.namespace }}
   labels:
-    app: spring-petclinic-{{ $name }}
+    app: {{ $config.containerName }}
 spec:
   replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: spring-petclinic-{{ $name }}
+      app: {{ $config.containerName }}
   template:
     metadata:
       labels:
-        app: spring-petclinic-{{ $name }}
+        app: {{ $config.containerName }}
     spec:
       containers:
-        - name: {{ $name }}
-          image: {{ $config.image }}:{{ $config.tag }}
+        - name: {{ $config.containerName }}
+          image: {{ $config.image }}:{{ $config.tag }} 
           imagePullPolicy: Always
           ports:
             - containerPort: {{ $config.port }}
