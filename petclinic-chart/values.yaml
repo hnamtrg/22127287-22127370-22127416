@@ -2,45 +2,45 @@ namespace: petclinic-dev
 services:
   config-server:
     containerName: config-server
-    image: chitaialm/petclinic:spring-petclinic-config-server-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-config-server-main
     port: 8888
   customers-service:
     containerName: customers-service
-    image: chitaialm/petclinic:spring-petclinic-customers-service-main
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-customers-service-main
     port: 8081
   discovery-server:
     containerName: discovery-server
-    image: chitaialm/petclinic:spring-petclinic-discovery-server-main 
-    tag: latest
+    image: chitaialm/petclinic 
+    tag: spring-petclinic-discovery-server-main 
     port: 8761
   visits-service:
     containerName: visits-service
-    image: chitaialm/petclinic:spring-petclinic-visits-service-main 
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-visits-service-main 
     port: 8082
   vets-service:
     containerName: vets-service
-    image: chitaialm/petclinic:spring-petclinic-vets-service-main 
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-vets-service-main 
     port: 8083
   genai-service:
     containerName: genai-service
-    image: chitaialm/petclinic:spring-petclinic-genai-service-main 
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-genai-service-main
     port: 8084
   api-gateway:
     containerName: api-gateway
-    image: chitaialm/petclinic:spring-petclinic-api-gateway-main 
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-api-gateway-main 
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
     containerName: admin-server
-    image: chitaialm/petclinic:spring-petclinic-admin-server-main 
-    tag: latest
+    image: chitaialm/petclinic
+    tag: spring-petclinic-admin-server-main 
     port: 9090
 replicaCount: 1
