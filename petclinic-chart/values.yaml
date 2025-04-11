@@ -1,38 +1,38 @@
-namespace: petclinic-dev
+namespace: ${NAMESPACE}
 services:
   config-server:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-config-server-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-config-server-${CONFIG_SERVER_TAG}
     port: 8888
   customers-service:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-customers-service-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-customers-service-${CUSTOMERS_SERVICE_TAG}
     port: 8081
   discovery-server:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-discovery-server-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-discovery-server-${DISCOVERY_SERVER_TAG}
     port: 8761
   visits-service:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-visits-service-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-visits-service-${VISITS_SERVICE_TAG}
     port: 8082
   vets-service:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-vets-service-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-vets-service-${VETS_SERVICE_TAG}
     port: 8083
   genai-service:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-genai-service-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-genai-service-${GENAI_SERVICE_TAG}
     port: 8084
   api-gateway:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-api-gateway-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-api-gateway-${API_GATEWAY_TAG}
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
-    image: chitaialm/petclinic
-    tag: spring-petclinic-admin-server-main
+    image: ${DOCKER_REGISTRY}
+    tag: spring-petclinic-admin-server-${ADMIN_SERVER_TAG}
     port: 9090
 replicaCount: 1

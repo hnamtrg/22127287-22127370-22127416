@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/hnamtrg/22127287-22127370-22127416
+    repoURL: https://github.com/Taihoclaptrinh/testtt
     path: petclinic-chart
-    targetRevision: feat/ArgoCD
+    targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: petclinic-dev
