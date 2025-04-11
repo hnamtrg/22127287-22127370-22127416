@@ -94,6 +94,7 @@ pipeline {
                     sh """
                     helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
                         --set namespace=${NAMESPACE} \\
+                        --set dockerRegistry="${DOCKER_REGISTRY}" \\
                         --set services.api-gateway.tag=${API_GATEWAY_TAG} \\
                         --set services.customers-service.tag=${CUSTOMERS_SERVICE_TAG} \\
                         --set services.vets-service.tag=${VETS_SERVICE_TAG} \\
