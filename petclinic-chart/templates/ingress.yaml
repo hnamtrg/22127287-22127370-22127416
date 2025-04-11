@@ -8,7 +8,10 @@ metadata:
   namespace: {{ $.Values.namespace }}
   labels:
     name: spring-petclinic-{{ $name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
   - host: {{ $config.ingress.host }}
     http:
