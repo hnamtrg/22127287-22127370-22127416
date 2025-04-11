@@ -17,7 +17,7 @@ spec:
         path: "/"
         backend:
           service:
-            name: spring-petclinic-{{ $name }}
+            name: {{ $name }}
             port:
               number: {{ $config.port }}
 {{- end }}
