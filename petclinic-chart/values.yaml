@@ -1,38 +1,38 @@
-namespace: ${NAMESPACE}
+namespace: "{{ .Values.namespace }}"
 services:
   config-server:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-config-server-${CONFIG_SERVER_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-config-server-{{ .Values.services.config-server.tag }}"
     port: 8888
   customers-service:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-customers-service-${CUSTOMERS_SERVICE_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-customers-service-{{ .Values.services.customers-service.tag }}"
     port: 8081
   discovery-server:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-discovery-server-${DISCOVERY_SERVER_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-discovery-server-{{ .Values.services.discovery-server.tag }}"
     port: 8761
   visits-service:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-visits-service-${VISITS_SERVICE_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-visits-service-{{ .Values.services.visits-service.tag }}"
     port: 8082
   vets-service:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-vets-service-${VETS_SERVICE_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-vets-service-{{ .Values.services.vets-service.tag }}"
     port: 8083
   genai-service:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-genai-service-${GENAI_SERVICE_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-genai-service-{{ .Values.services.genai-service.tag }}"
     port: 8084
   api-gateway:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-api-gateway-${API_GATEWAY_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-api-gateway-{{ .Values.services.api-gateway.tag }}"
     port: 8080
     ingress:
       enabled: true
-      host: petclinic-dev.tech
+      host: "{{ .Values.services.api-gateway.ingress.host }}"
   admin-server:
-    image: ${DOCKER_REGISTRY}
-    tag: spring-petclinic-admin-server-${ADMIN_SERVER_TAG}
+    image: "{{ .Values.dockerRegistry }}"
+    tag: "spring-petclinic-admin-server-{{ .Values.services.admin-server.tag }}"
     port: 9090
-replicaCount: 1
+replicaCount: {{ .Values.replicaCount }}
