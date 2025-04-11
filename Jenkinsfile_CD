@@ -22,7 +22,7 @@ pipeline {
     stages {
         stage('Checkout Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/spring-petclinic-microservices.git'
+                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
             }
         }
 
