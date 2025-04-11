@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: {{ $name }}
-          image: {{ $config.image }}:{{ $config.tag }}
+          image: {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
           imagePullPolicy: Always
           ports:
             - containerPort: {{ $config.port }}
