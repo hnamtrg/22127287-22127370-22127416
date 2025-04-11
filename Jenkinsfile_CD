@@ -95,14 +95,14 @@ pipeline {
                     helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
                         --set namespace=${NAMESPACE} \\
                         --set dockerRegistry="${DOCKER_REGISTRY}" \\
-                        --set services.api_gateway.tag=${API_GATEWAY_TAG} \\
-                        --set services.customers_service.tag=${CUSTOMERS_SERVICE_TAG} \\
-                        --set services.vets_service.tag=${VETS_SERVICE_TAG} \\
-                        --set services.visits_service.tag=${VISITS_SERVICE_TAG} \\
-                        --set services.admin_server.tag=${ADMIN_SERVER_TAG} \\
-                        --set services.discovery_server.tag=${DISCOVERY_SERVER_TAG} \\
-                        --set services.config_server.tag=${CONFIG_SERVER_TAG} \\
-                        --set services.genai_service.tag=${GENAI_SERVICE_TAG}
+                        --set services.api-gateway.tag=${API_GATEWAY_TAG} \\
+                        --set services.customers-service.tag=${CUSTOMERS_SERVICE_TAG} \\
+                        --set services.vets-service.tag=${VETS_SERVICE_TAG} \\
+                        --set services.visits-service.tag=${VISITS_SERVICE_TAG} \\
+                        --set services.admin-server.tag=${ADMIN_SERVER_TAG} \\
+                        --set services.discovery-server.tag=${DISCOVERY_SERVER_TAG} \\
+                        --set services.config-server.tag=${CONFIG_SERVER_TAG} \\
+                        --set services.genai-service.tag=${GENAI_SERVICE_TAG}
                     """
                 }
             }

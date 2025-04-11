@@ -1,38 +1,38 @@
-namespace: {{.Values.namespace}}
+namespace: petclinic-dev
 services:
   config-server:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-config-server-{{.Values.services.config_server.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-config-server-main
     port: 8888
   customers-service:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-customers-service-{{.Values.services.customers_service.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-customers-service-main
     port: 8081
   discovery-server:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-discovery-server-{{.Values.services.discovery_server.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-discovery-server-main
     port: 8761
   visits-service:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-visits-service-{{.Values.services.services.visits_service.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-visits-service-main
     port: 8082
   vets-service:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-vets-service-{{.Values.services.vets_service.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-vets-service-main
     port: 8083
   genai-service:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-genai-service-{{.Values.services.genai_service.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-genai-service-main
     port: 8084
   api-gateway:
-    image: {{.Values.dockerRegistry}}
-    tag: spring-petclinic-api-gateway-{{.Values.services.api_gateway.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-api-gateway-main
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
-    image: {{.Values.dockerRegistry}} 
-    tag: spring-petclinic-admin-server-{{.Values.services.admin_server.tag}}
+    image: chitaialm/petclinic
+    tag: spring-petclinic-admin-server-main
     port: 9090
 replicaCount: 1
