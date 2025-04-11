@@ -103,11 +103,6 @@ pipeline {
                         --set services.config-server.tag=${CONFIG_SERVER_TAG} \\
                         --set services.genai-service.tag=${GENAI_SERVICE_TAG}
                     """
-
-                    // Wait for important deployments
-                    sh "kubectl rollout status deployment/config-server -n ${NAMESPACE} --timeout=120s"
-                    sh "kubectl rollout status deployment/discovery-server -n ${NAMESPACE} --timeout=120s"
-                    sh "kubectl rollout status deployment/api-gateway -n ${NAMESPACE} --timeout=180s"
                 }
             }
         }
