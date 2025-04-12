@@ -1,5 +1,4 @@
 {{- range $name, $config := .Values.services }}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
