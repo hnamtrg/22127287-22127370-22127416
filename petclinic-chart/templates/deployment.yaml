@@ -18,9 +18,9 @@ spec:
         app: spring-petclinic-{{ $name }}
     spec:
       containers:
-        - name: {{ $name }}
-          image: {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
-          imagePullPolicy: Always
-          ports:
-            - containerPort: {{ $config.port }}
+      - name: {{ $name }}
+        mage: {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{ $config.port }}
 {{- end }}
