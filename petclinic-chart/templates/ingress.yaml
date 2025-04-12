@@ -8,14 +8,14 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: {{ .Values.services.api-gateway.ingress.host }}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: spring-petclinic-api-gateway
-            port:
-              number: {{ .Values.services.api-gateway.port }}
+    - host: {{ .Values.services.api-gateway.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spring-petclinic-api-gateway
+                port:
+                  number: {{ .Values.services.api-gateway.port }}
 {{- end }}
