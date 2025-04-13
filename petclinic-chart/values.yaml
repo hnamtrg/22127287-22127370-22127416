@@ -36,9 +36,8 @@ services:
     tagname: spring-petclinic-admin-server
     port: 9090
   tracing-server:
-    name: tracing-server
     image: chitaialm/petclinic
-    tagname: tracing
+    tagname: tracing-server
     tag: main
     port: 9411
 replicaCount: 1
