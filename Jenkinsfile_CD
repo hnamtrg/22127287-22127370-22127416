@@ -92,7 +92,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    helm upgrade --install petclinic-chart ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
+                    helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
                         --set namespace=${NAMESPACE} \\
                         --set dockerRegistry="${DOCKER_REGISTRY}" \\
                         --set services.api-gateway.tag=${API_GATEWAY_TAG} \\
