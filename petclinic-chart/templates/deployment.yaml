@@ -1,4 +1,4 @@
-{{ range $name, $config := .Values.services }}
+{{- range $name, $config := .Values.services }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -19,12 +19,8 @@ spec:
     spec:
       containers:
       - name: {{ $name }}
-        image: {{ if eq $name "tracing" }}
-          chitaialm/petclinic:tracing-main
-          {{- else }}
-          {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
-          {{- end }}
+        mage: {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
         imagePullPolicy: Always
         ports:
         - containerPort: {{ $config.port }}
-{{ end }}
+{{- end }}
