@@ -30,7 +30,7 @@ services:
     port: 8080
     ingress:
       enabled: true
-      host: petclinic-dev1.tech
+      host: petclinic-dev.tech
   admin-server:
     image: chitaialm/petclinic
     tag: spring-petclinic-admin-server-main

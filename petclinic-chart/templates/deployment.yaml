@@ -19,7 +19,11 @@ spec:
     spec:
       containers:
       - name: {{ $name }}
-        image: {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
+        image: {{ if eq $name "tracing" }}
+          chitaialm/petclinic:tracing-main
+          {{- else }}
+          {{ $config.image }}:spring-petclinic-{{ $name }}-{{ $config.tag }}
+          {{- end }}
         imagePullPolicy: Always
         ports:
         - containerPort: {{ $config.port }}
