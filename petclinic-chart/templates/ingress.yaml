@@ -15,7 +15,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: spring-petclinic-api-gateway
+            name: api-gateway
             port:
               number: {{ (index .Values.services $API).port }}
 {{ end }}
