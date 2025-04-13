@@ -1,9 +1,9 @@
-{{- range $name, $config := .Values.services }}
+{{ range $name, $config := .Values.services }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $name }}zz
+  name: {{ $name }}
   namespace: {{ $.Values.namespace }}
 spec:
   selector:
@@ -13,4 +13,4 @@ spec:
     - protocol: TCP
       port: {{ $config.port }}
       targetPort: {{ $config.port }}
-{{- end }}
+{{ end }}
