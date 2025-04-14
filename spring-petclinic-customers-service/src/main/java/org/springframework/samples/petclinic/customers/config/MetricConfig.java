@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MetricConfig {
-//dddddd
   @Bean
   public MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
       return registry -> registry.config().commonTags("application", "petclinic");
