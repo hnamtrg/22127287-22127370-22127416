@@ -23,4 +23,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: {{ $config.port }}
+          env:
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: {{ $config.containerName }}
 {{- end }}
