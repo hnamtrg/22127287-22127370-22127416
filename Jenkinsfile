@@ -2,7 +2,7 @@ pipeline {
     agent { label 'k8s-agent' }
 
     environment {
-        TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(4)}"
+        TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(7)}"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
         BRANCH_NAME = "${env.BRANCH_NAME}"
         COMMIT_ID = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()

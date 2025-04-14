@@ -29,7 +29,6 @@ pipeline {
         stage('Get Commit IDs') {
             steps {
                 script {
-                    // Lấy commit ID cho mỗi branch không phải main
                     if (params.api_gateway != 'main') {
                         env.API_GATEWAY_TAG = getCommitId('spring-petclinic-api-gateway', params.api_gateway)
                     } else {
@@ -94,15 +93,14 @@ pipeline {
                     sh """
                     helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
                         --set namespace=${NAMESPACE} \\
-                        --set dockerRegistry="${DOCKER_REGISTRY}" \\
-                        --set services.api-gateway.tag=${API_GATEWAY_TAG} \\
-                        --set services.customers-service.tag=${CUSTOMERS_SERVICE_TAG} \\
-                        --set services.vets-service.tag=${VETS_SERVICE_TAG} \\
-                        --set services.visits-service.tag=${VISITS_SERVICE_TAG} \\
-                        --set services.admin-server.tag=${ADMIN_SERVER_TAG} \\
-                        --set services.discovery-server.tag=${DISCOVERY_SERVER_TAG} \\
-                        --set services.config-server.tag=${CONFIG_SERVER_TAG} \\
-                        --set services.genai-service.tag=${GENAI_SERVICE_TAG}
+                        --set services.api-gateway.commit=${env.GIT_TAG} \\
+                        --set services.customers-service.commit=${env.GIT_TAG} \\
+                        --set services.vets-service.commit=${env.GIT_TAG} \\
+                        --set services.visits-service.commit=${env.GIT_TAG} \\
+                        --set services.admin-server.commit=${env.GIT_TAG} \\
+                        --set services.discovery-server.commit=${env.GIT_TAG} \\
+                        --set services.config-server.commit=${env.GIT_TAG} \\
+                        --set services.genai-service.commit=${env.GIT_TAG}
                     """
                 }
             }
