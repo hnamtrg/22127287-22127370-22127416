@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'k8s-agent' }
 
     environment {
         TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(4)}"
