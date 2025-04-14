@@ -93,14 +93,14 @@ pipeline {
                     sh """
                     helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
                         --set namespace=${NAMESPACE} \\
-                        --set services.api-gateway.commit=${env.GIT_TAG} \\
-                        --set services.customers-service.commit=${env.GIT_TAG} \\
-                        --set services.vets-service.commit=${env.GIT_TAG} \\
-                        --set services.visits-service.commit=${env.GIT_TAG} \\
-                        --set services.admin-server.commit=${env.GIT_TAG} \\
-                        --set services.discovery-server.commit=${env.GIT_TAG} \\
-                        --set services.config-server.commit=${env.GIT_TAG} \\
-                        --set services.genai-service.commit=${env.GIT_TAG}
+                        --set services.api-gateway.commit=${API_GATEWAY_TAG} \\
+                        --set services.customers-service.commit=${CUSTOMERS_SERVICE_TAG} \\
+                        --set services.vets-service.commit=${VETS_SERVICE_TAG} \\
+                        --set services.visits-service.commit=${VISITS_SERVICE_TAG} \\
+                        --set services.admin-server.commit=${ADMIN_SERVER_TAG} \\
+                        --set services.discovery-server.commit=${DISCOVERY_SERVER_TAG} \\
+                        --set services.config-server.commit=${CONFIG_SERVER_TAG} \\
+                        --set services.genai-service.commit=${GENAI_SERVICE_TAG}
                     """
                 }
             }
