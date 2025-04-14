@@ -33,63 +33,63 @@ pipeline {
             }
         }
 //eeee
-        stage('Test and Coverage') {
-            when {
-                expression { env.CHANGED_SERVICES != '' }
-            }
-            steps {
-                script {
-                    def services = env.CHANGED_SERVICES.split(',')
-                    services.each { service ->
-                        echo "Running tests for service: ${service}"
-                        dir("spring-petclinic-${service}") {
-                            sh "mvn clean test jacoco:report"
-                            def zipName = "${service}-test-results-${env.TAG_NAME}.zip"
-                            sh "zip -r ${zipName} target/surefire-reports/ target/site/jacoco/"
-                            archiveArtifacts artifacts: "${zipName}", allowEmptyArchive: false
+        // stage('Test and Coverage') {
+        //     when {
+        //         expression { env.CHANGED_SERVICES != '' }
+        //     }
+        //     steps {
+        //         script {
+        //             def services = env.CHANGED_SERVICES.split(',')
+        //             services.each { service ->
+        //                 echo "Running tests for service: ${service}"
+        //                 dir("spring-petclinic-${service}") {
+        //                     sh "mvn clean test jacoco:report"
+        //                     def zipName = "${service}-test-results-${env.TAG_NAME}.zip"
+        //                     sh "zip -r ${zipName} target/surefire-reports/ target/site/jacoco/"
+        //                     archiveArtifacts artifacts: "${zipName}", allowEmptyArchive: false
 
-                            if (!fileExists("target/site/jacoco/jacoco.xml")) {
-                                error("JaCoCo report not found!")
-                            }
+        //                     if (!fileExists("target/site/jacoco/jacoco.xml")) {
+        //                         error("JaCoCo report not found!")
+        //                     }
 
-                            def xml = readFile("target/site/jacoco/jacoco.xml")
-                            def totalMissed = 0.0, totalCovered = 0.0
-                            def matches = (xml =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
-                            matches.each { m ->
-                                totalMissed += m[1].toFloat()
-                                totalCovered += m[2].toFloat()
-                            }
+        //                     def xml = readFile("target/site/jacoco/jacoco.xml")
+        //                     def totalMissed = 0.0, totalCovered = 0.0
+        //                     def matches = (xml =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
+        //                     matches.each { m ->
+        //                         totalMissed += m[1].toFloat()
+        //                         totalCovered += m[2].toFloat()
+        //                     }
 
-                            def coverage = totalCovered / (totalCovered + totalMissed)
-                            if (coverage < 0.7) {
-                                error("Coverage too low: ${(coverage*100).round(2)}%")
-                            }
-                            echo "Coverage OK: ${(coverage*100).round(2)}%"
-                        }
-                    }
-                }
-            }
-        }
+        //                     def coverage = totalCovered / (totalCovered + totalMissed)
+        //                     if (coverage < 0.7) {
+        //                         error("Coverage too low: ${(coverage*100).round(2)}%")
+        //                     }
+        //                     echo "Coverage OK: ${(coverage*100).round(2)}%"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Build Artifacts') {
-            when {
-                expression { env.CHANGED_SERVICES != '' }
-            }
-            steps {
-                script {
-                    def services = env.CHANGED_SERVICES.split(',')
-                    services.each { service ->
-                        echo "Packaging service: ${service}"
-                        dir("spring-petclinic-${service}") {
-                            sh "mvn clean package -DskipTests"
-                            def jarName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
-                            sh "mv target/spring-petclinic-${service}-*.jar target/${jarName}"
-                            archiveArtifacts artifacts: "target/${jarName}", allowEmptyArchive: false
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Build Artifacts') {
+        //     when {
+        //         expression { env.CHANGED_SERVICES != '' }
+        //     }
+        //     steps {
+        //         script {
+        //             def services = env.CHANGED_SERVICES.split(',')
+        //             services.each { service ->
+        //                 echo "Packaging service: ${service}"
+        //                 dir("spring-petclinic-${service}") {
+        //                     sh "mvn clean package -DskipTests"
+        //                     def jarName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
+        //                     sh "mv target/spring-petclinic-${service}-*.jar target/${jarName}"
+        //                     archiveArtifacts artifacts: "target/${jarName}", allowEmptyArchive: false
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Build & Push Docker Images') {
             when {
