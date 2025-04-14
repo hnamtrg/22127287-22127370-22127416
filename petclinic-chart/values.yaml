@@ -1,4 +1,4 @@
-namespace: developer-85
+namespace: developer-86
 version: 'main'
 services:
   config-server:
