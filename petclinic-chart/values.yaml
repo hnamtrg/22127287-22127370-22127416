@@ -1,4 +1,4 @@
-namespace: petclinic-dev
+namespace: developer-85
 version: 'main'
 services:
   config-server:
