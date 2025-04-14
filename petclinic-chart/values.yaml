@@ -1,46 +1,47 @@
 namespace: petclinic-dev
+version: 'main'
 services:
   config-server:
     containerName: config-server
     image: chitaialm/petclinic
     tag: spring-petclinic-config-server
-    commit: 'main'
+    commit: ""
     port: 8888
   customers-service:
     containerName: customers-service
     image: chitaialm/petclinic
     tag: spring-petclinic-customers-service
-    commit: 'main'
+    commit: ""
     port: 8081
   discovery-server:
     containerName: discovery-server
     image: chitaialm/petclinic 
     tag: spring-petclinic-discovery-server
-    commit: 'main' 
+    commit: ""
     port: 8761
   visits-service:
     containerName: visits-service
     image: chitaialm/petclinic
     tag: spring-petclinic-visits-service 
-    commit: 'main'
+    commit: ""
     port: 8082
   vets-service:
     containerName: vets-service
     image: chitaialm/petclinic
     tag: spring-petclinic-vets-service 
-    commit: 'main'
+    commit: ""
     port: 8083
   genai-service:
     containerName: genai-service
     image: chitaialm/petclinic
     tag: spring-petclinic-genai-service
-    commit: 'main'
+    commit: ""
     port: 8084
   api-gateway:
     containerName: api-gateway
     image: chitaialm/petclinic
     tag: spring-petclinic-api-gateway
-    commit: 'main' 
+    commit: ""
     port: 8080
     ingress:
       enabled: true
@@ -49,12 +50,6 @@ services:
     containerName: admin-server
     image: chitaialm/petclinic
     tag: spring-petclinic-admin-server
-    commit: 'main' 
+    commit: "" 
     port: 9090
-  tracing-server:
-    containerName: tracing-server
-    image: chitaialm/petclinic
-    tag: tracing-server
-    commit: 'main'
-    port: 9411
 replicaCount: 1

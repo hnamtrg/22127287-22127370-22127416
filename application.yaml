@@ -11,7 +11,7 @@ spec:
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc
-    namespace: petclinic-dev
+    namespace: developer-86
   syncPolicy:
     automated:
       prune: true
