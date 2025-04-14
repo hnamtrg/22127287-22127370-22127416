@@ -46,6 +46,6 @@ services:
   tracing-server:
     containerName: tracing-server
     image: chitaialm/petclinic
-    tag: tracing-main
+    tag: tracing-server-main
     port: 9411
 replicaCount: 1
