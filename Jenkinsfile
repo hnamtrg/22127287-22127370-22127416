@@ -1,9 +1,9 @@
 pipeline {
-    agent { label 'build-server' }
+    agent any
 
     environment {
         TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(4)}"
-        DOCKER_REGISTRY = 'tinnqforwork/petclinic'
+        DOCKER_REGISTRY = 'chitaialm/petclinic'
         BRANCH_NAME = "${env.BRANCH_NAME}"
         COMMIT_ID = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
     }
