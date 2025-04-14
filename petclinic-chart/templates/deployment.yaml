@@ -3,24 +3,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $name }}
+  name: {{ $config.containerName }}
   namespace: {{ $.Values.namespace }}
   labels:
-    app: {{ $name }}
+    app: {{ $config.containerName }}
 spec:
   replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $name }}
+      app: {{ $config.containerName }}
   template:
     metadata:
       labels:
-        app: {{ $name }}
+        app: {{ $config.containerName }}
     spec:
       containers:
-      - name: {{ $name }}
-        image: {{ $config.image }}:{{ $config.tagname }}-{{ $config.tag }}
-        imagePullPolicy: Always
-        ports:
-        - containerPort: {{ $config.port }}
+        - name: {{ $config.containerName }}
+          image: {{ $config.image }}:{{ $config.tag }} 
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ $config.port }}
 {{- end }}

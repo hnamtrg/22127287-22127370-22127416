@@ -1,43 +1,51 @@
 namespace: petclinic-dev
 services:
   config-server:
+    containerName: config-server
     image: chitaialm/petclinic
-    tagname: spring-petclinic-config-server
+    tag: spring-petclinic-config-server-main
     port: 8888
   customers-service:
+    containerName: customers-service
     image: chitaialm/petclinic
-    tagname: spring-petclinic-customers-service
+    tag: spring-petclinic-customers-service-main
     port: 8081
   discovery-server:
-    image: chitaialm/petclinic
-    tagname: spring-petclinic-discovery-server
+    containerName: discovery-server
+    image: chitaialm/petclinic 
+    tag: spring-petclinic-discovery-server-main 
     port: 8761
   visits-service:
+    containerName: visits-service
     image: chitaialm/petclinic
-    tagname: spring-petclinic-visits-service
+    tag: spring-petclinic-visits-service-main 
     port: 8082
   vets-service:
+    containerName: vets-service
     image: chitaialm/petclinic
-    tagname: spring-petclinic-vets-service
+    tag: spring-petclinic-vets-service-main 
     port: 8083
   genai-service:
+    containerName: genai-service
     image: chitaialm/petclinic
-    tagname: spring-petclinic-genai-service
+    tag: spring-petclinic-genai-service-main
     port: 8084
   api-gateway:
+    containerName: api-gateway
     image: chitaialm/petclinic
-    tagname: spring-petclinic-api-gateway
+    tag: spring-petclinic-api-gateway-main 
     port: 8080
     ingress:
       enabled: true
       host: petclinic-dev.tech
   admin-server:
+    containerName: admin-server
     image: chitaialm/petclinic
-    tagname: spring-petclinic-admin-server
+    tag: spring-petclinic-admin-server-main 
     port: 9090
   tracing-server:
+    containerName: tracing-server
     image: chitaialm/petclinic
-    tagname: tracing-server
-    tag: main
+    tag: tracing-main
     port: 9411
 replicaCount: 1

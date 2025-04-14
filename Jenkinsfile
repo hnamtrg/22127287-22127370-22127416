@@ -1,51 +1,29 @@
-def get_service_name(file_path) {
-    def parts = file_path.split('/')
-    if (parts.size() < 1) {
-        return null
-    }
-    def directory_name = parts[0]
-    if (directory_name.startsWith("spring-petclinic-")) {
-        return directory_name.substring("spring-petclinic-".length())
-    } else {
-        return null
-    }
-}
-
-def parseJacocoCoverage(String xmlContent) {
-    def coverage = [:]
-    def totalMissed = 0.0
-    def totalCovered = 0.0
-
-    def instructionCounters = (xmlContent =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
-    instructionCounters.each { match ->
-        totalMissed += match[1].toFloat()
-        totalCovered += match[2].toFloat()
-    }
-
-    coverage.instruction = totalCovered / (totalMissed + totalCovered)
-    return coverage
-}
-
 pipeline {
-    agent { label '22127287-22127416-22127370' }
+    agent { label 'build-server' }
+
     environment {
         TAG_NAME = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(4)}"
+        DOCKER_REGISTRY = 'tinnqforwork/petclinic'
+        BRANCH_NAME = "${env.BRANCH_NAME}"
+        COMMIT_ID = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
     }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Identify Changed Services') {
             steps {
                 script {
                     def changedFiles = sh(script: "git diff --name-only ${env.GIT_COMMIT}^ ${env.GIT_COMMIT}", returnStdout: true)
                     def services = []
                     changedFiles.split('\n').each { file ->
-                        def service_name = get_service_name(file)
-                        if (service_name) {
-                            services.add(service_name)
+                        def parts = file.split('/')
+                        if (parts.size() > 0 && parts[0].startsWith("spring-petclinic-")) {
+                            services.add(parts[0].replace("spring-petclinic-", ""))
                         }
                     }
                     services = services.unique()
@@ -54,6 +32,7 @@ pipeline {
                 }
             }
         }
+
         stage('Test and Coverage') {
             when {
                 expression { env.CHANGED_SERVICES != '' }
@@ -65,29 +44,34 @@ pipeline {
                         echo "Running tests for service: ${service}"
                         dir("spring-petclinic-${service}") {
                             sh "mvn clean test jacoco:report"
-                            def testResultsZip = "${service}-test-results-${env.TAG_NAME}.zip"
-                            sh "zip -r ${testResultsZip} target/surefire-reports/ target/site/jacoco/"
-                            archiveArtifacts artifacts: "${testResultsZip}", allowEmptyArchive: false
+                            def zipName = "${service}-test-results-${env.TAG_NAME}.zip"
+                            sh "zip -r ${zipName} target/surefire-reports/ target/site/jacoco/"
+                            archiveArtifacts artifacts: "${zipName}", allowEmptyArchive: false
 
                             if (!fileExists("target/site/jacoco/jacoco.xml")) {
-                                error("JaCoCo report file (jacoco.xml) not found!")
+                                error("JaCoCo report not found!")
                             }
-                            def jacocoXml = readFile(file: "target/site/jacoco/jacoco.xml")
-                            def coverage = parseJacocoCoverage(jacocoXml)
 
-                            def minCoverage = 0.70
-                            def totalInstructionCoverage = coverage.instruction
-                            if (totalInstructionCoverage >= minCoverage) {
-                                echo "Test coverage is sufficient! Instruction Coverage: ${totalInstructionCoverage*100}%"
-                            } else {
-                                error("Test coverage is insufficient! Required: 70%, Got: ${totalInstructionCoverage*100}%")
+                            def xml = readFile("target/site/jacoco/jacoco.xml")
+                            def totalMissed = 0.0, totalCovered = 0.0
+                            def matches = (xml =~ /<counter type="INSTRUCTION" missed="([^"]*)" covered="([^"]*)"/)
+                            matches.each { m ->
+                                totalMissed += m[1].toFloat()
+                                totalCovered += m[2].toFloat()
                             }
+
+                            def coverage = totalCovered / (totalCovered + totalMissed)
+                            if (coverage < 0.7) {
+                                error("Coverage too low: ${(coverage*100).round(2)}%")
+                            }
+                            echo "Coverage OK: ${(coverage*100).round(2)}%"
                         }
                     }
                 }
             }
         }
-        stage('Build') {
+
+        stage('Build Artifacts') {
             when {
                 expression { env.CHANGED_SERVICES != '' }
             }
@@ -95,16 +79,76 @@ pipeline {
                 script {
                     def services = env.CHANGED_SERVICES.split(',')
                     services.each { service ->
-                        echo "Building service without tests: ${service}"
+                        echo "Packaging service: ${service}"
                         dir("spring-petclinic-${service}") {
                             sh "mvn clean package -DskipTests"
-                            def artifactName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
-                            sh "mv target/spring-petclinic-${service}-*.jar target/${artifactName}"
-                            archiveArtifacts artifacts: "target/${artifactName}", allowEmptyArchive: false
+                            def jarName = "spring-petclinic-${service}-${env.TAG_NAME}.jar"
+                            sh "mv target/spring-petclinic-${service}-*.jar target/${jarName}"
+                            archiveArtifacts artifacts: "target/${jarName}", allowEmptyArchive: false
                         }
                     }
                 }
             }
+        }
+
+        stage('Build & Push Docker Images') {
+            when {
+                expression { env.CHANGED_SERVICES != '' }
+            }
+            steps {
+                script {
+                    def serviceMap = [
+                        'config-server': '8888',
+                        'discovery-server': '8761',
+                        'customers-service': '8081',
+                        'visits-service': '8082',
+                        'vets-service': '8083',
+                        'genai-service': '8084',
+                        'api-gateway': '8080',
+                        'admin-server': '9090'
+                    ]
+
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                    }
+
+                    def services = env.CHANGED_SERVICES.split(',')
+                    services.each { service ->
+                        def serviceName = "spring-petclinic-${service}"
+                        def port = serviceMap[service]
+                        if (!port) {
+                            echo "Skipping unknown service: ${service}"
+                            return
+                        }
+                        
+                        if (BRANCH_NAME == 'main') {
+                            COMMIT_ID = "main"
+                        }
+                        echo "Building Docker for ${serviceName}"
+                        sh """
+                            docker build \
+                            --build-arg SERVICE_NAME=${serviceName} \
+                            --build-arg SERVICE_PORT=${port} \
+                            -t ${DOCKER_REGISTRY}:${serviceName}-${COMMIT_ID} .
+                        """
+                        sh "docker push ${DOCKER_REGISTRY}:${serviceName}-${COMMIT_ID}"
+                    }
+
+                    sh 'docker logout'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed. Check logs."
+        }
+        always {
+            sh "docker system prune -f"
         }
     }
 }
