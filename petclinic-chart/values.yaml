@@ -33,7 +33,7 @@ services:
   api-gateway:
     containerName: api-gateway
     image: chitaialm/petclinic
-    tag: spring-petclinic-api-gateway-v1
+    tag: spring-petclinic-api-gateway-main
     port: 8080
     ingress:
       enabled: true
