@@ -12,8 +12,11 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
                 
                 script {
+                    echo "Webhook tag_name: ${env.tag_name}"
+                    echo "GIT_TAG: ${env.GIT_TAG}"
                     if (env.GIT_TAG) {
                         sh "git fetch --tags"
+                        sh "git tag -l" // In danh sách tag để debug
                         sh "git checkout ${env.GIT_TAG}"
                     } else {
                         echo "No tag provided, staying on main branch"
