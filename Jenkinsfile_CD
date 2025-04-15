@@ -88,6 +88,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Show Delete Link') {
+            steps {
+                echo "Current build: ${env.BUILD_URL}"
+                echo "Delete deployment: ${env.JENKINS_URL}job/delete-deployment/buildWithParameters?BUILD_NUMBER_TO_DELETE=${env.BUILD_NUMBER}"
+            }
+        }
     }
     
     post {
