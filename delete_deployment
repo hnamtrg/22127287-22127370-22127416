@@ -1,0 +1,32 @@
+pipeline {
+    agent { label 'k8s-agent' }
+
+    parameters {
+        string(name: 'BUILD_NUMBER_TO_DELETE', description: 'Build number to delete')
+    }
+
+    environment {
+        TARGET_NAMESPACE = "developer-${params.BUILD_NUMBER_TO_DELETE}"
+    }
+
+    stages {
+        stage('Check Namespace') {
+            steps {
+                script {
+                    def nsExists = sh(script: "kubectl get namespace ${TARGET_NAMESPACE} --no-headers || true", returnStatus: true)
+                    if (nsExists != 0) {
+                        error(" Namespace ${TARGET_NAMESPACE} không tồn tại.")
+                    }
+                    echo " Namespace ${TARGET_NAMESPACE} tồn tại. Chuẩn bị xoá."
+                }
+            }
+        }
+
+        stage('Delete Namespace') {
+            steps {
+                sh "kubectl delete namespace ${TARGET_NAMESPACE}"
+                echo "Đã xoá namespace: ${TARGET_NAMESPACE}"
+            }
+        }
+    }
+}

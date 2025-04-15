@@ -105,14 +105,17 @@ def getCommitId(serviceName, branch) {
         returnStdout: true
     ).trim().take(7)
 
-    def tag = "${cleanBranch}-${commitId}"
+    def tag = ""
     if (cleanBranch == "main") {
         tag = "main"
+    } else {
+        tag = "${cleanBranch}-${commitId}"
     }
 
     echo "Service: ${serviceName}, Branch: ${cleanBranch}, Commit ID: ${commitId}, Tag: ${tag}"
     return tag
 }
+
 
 
 
