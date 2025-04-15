@@ -1,39 +1,42 @@
 pipeline {
     agent { label 'k8s-agent' }
 
+    parameters {
+        string(name: 'tag_name', defaultValue: '', description: 'Git tag from webhook')
+    }
     environment {
         NAMESPACE = "staging"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
-        GIT_TAG = "${env.tag_name}"
-    }
+        GIT_TAG = "${env.tag_name ?: sh(script: 'git describe --tags --exact-match || echo \"\"', returnStdout: true).trim()}"    }
+
     stages {
         stage('Validate Tag') {
             steps {
                 script {
-                    echo "Webhook tag_name: ${env.tag_name}"
-                    echo "GIT_TAG: ${env.GIT_TAG}"
-                    if (!env.GIT_TAG) {
+                    echo "Webhook tag_name: ${params.tag_name}"
+                    GIT_TAG = params.tag_name?.trim()
+                    if (!GIT_TAG) {
                         error "No tag provided. This job only runs for tag pushes."
                     }
                 }
             }
         }
-
+        
         stage('Checkout Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
-                
                 script {
+                    GIT_TAG = params.tag_name?.trim()
+                    git url: 'https://github.com/Taihoclaptrinh/testtt.git'
                     sh "git fetch --tags"
-                    sh "git tag -l"
-                    sh "git checkout ${env.GIT_TAG}"
+                    sh "git tag -l" // Debug
+                    sh "git checkout ${GIT_TAG}"
                 }
             }
         }
 
         stage('Build All Docker Images for Tag') {
             when {
-                expression { return env.GIT_TAG?.trim() }
+                expression { return params.tag_name?.trim() }
             }
             steps {
                 script {
@@ -53,7 +56,7 @@ pipeline {
                     }
 
                     serviceMap.each { service, port ->
-                        def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}-${env.GIT_TAG}"
+                        def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}-${params.tag_name}"
                         echo "Building Docker image for ${service} → ${imageName}"
 
                         sh """
