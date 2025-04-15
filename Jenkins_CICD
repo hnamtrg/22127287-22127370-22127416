@@ -26,10 +26,11 @@ pipeline {
             steps {
                 script {
                     def GIT_TAG = params.tag_name?.trim()
-                    git url: 'https://github.com/Taihoclaptrinh/testtt.git'
-                    sh "git fetch --tags"
-                    sh "git tag -l" // Debug
-                    sh "git checkout ${GIT_TAG}"
+                    echo "Checking out tag: ${GIT_TAG}"
+                    // Fetch all tags and branches to ensure you have the latest data
+                    sh "git fetch --all"
+                    sh "git tag -l" // Debug: Liệt kê tất cả các tag
+                    sh "git checkout tags/${GIT_TAG}" // Chắc chắn checkout đúng tag
                 }
             }
         }
