@@ -14,6 +14,7 @@
         <version>3.4.1</version>
 	</parent>
 
+
     <properties>
         <docker.image.exposed.port>8081</docker.image.exposed.port>
         <docker.image.dockerfile.dir>${basedir}/../docker</docker.image.dockerfile.dir>
