@@ -1,31 +1,43 @@
 pipeline {
-    agent { label 'k8s-agent' }
+    agent {
+        label 'k8s-agent'
+    }
 
     parameters {
-        string(name: 'BUILD_NUMBER_TO_DELETE', description: 'Build number to delete')
+        string(name: 'BUILD_NUMBER_TO_DELETE', defaultValue: '', description: 'Build number to delete deployment namespace')
     }
 
     environment {
-        TARGET_NAMESPACE = "developer-${params.BUILD_NUMBER_TO_DELETE}"
+        NAMESPACE = "developer-${params.BUILD_NUMBER_TO_DELETE}"
     }
 
     stages {
+        stage('Validate Input') {
+            steps {
+                script {
+                    if (!params.BUILD_NUMBER_TO_DELETE?.trim()) {
+                        error("BUILD_NUMBER_TO_DELETE is required!")
+                    }
+                }
+            }
+        }
+
         stage('Check Namespace') {
             steps {
                 script {
-                    def nsExists = sh(script: "kubectl get namespace ${TARGET_NAMESPACE} --no-headers || true", returnStatus: true)
-                    if (nsExists != 0) {
-                        error(" Namespace ${TARGET_NAMESPACE} không tồn tại.")
+                    def nsExists = sh(script: "kubectl get namespace ${NAMESPACE} --no-headers || true", returnStdout: true).trim()
+                    if (nsExists) {
+                        echo "Namespace ${NAMESPACE} exists. Proceeding with deletion."
+                    } else {
+                        error "Namespace ${NAMESPACE} does not exist."
                     }
-                    echo " Namespace ${TARGET_NAMESPACE} tồn tại. Chuẩn bị xoá."
                 }
             }
         }
 
         stage('Delete Namespace') {
             steps {
-                sh "kubectl delete namespace ${TARGET_NAMESPACE}"
-                echo "Đã xoá namespace: ${TARGET_NAMESPACE}"
+                sh "kubectl delete namespace ${NAMESPACE}"
             }
         }
     }
