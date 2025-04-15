@@ -29,6 +29,7 @@ pipeline {
         stage('Get Commit IDs') {
             steps {
                 script {
+
                     env.API_GATEWAY_TAG = getCommitId('spring-petclinic-api-gateway', params.api_gateway)
     
                     env.CUSTOMERS_SERVICE_TAG = getCommitId('spring-petclinic-customers-service', params.customers_service)
@@ -103,10 +104,11 @@ def getCommitId(serviceName, branch) {
         returnStdout: true
     ).trim().take(7)
 
-    def tag = "${branch}-${commitId ?: 'unknown'}"
+    def tag = branch == "main" ? "main" : "${branch}-${commitId ?: 'unknown'}"
 
     echo "Service: ${serviceName}, Branch: ${branch}, Commit ID: ${commitId}, Tag: ${tag}"
 
     return tag
 }
+
 
