@@ -7,20 +7,26 @@ pipeline {
         GIT_TAG = "${env.tag_name ?: sh(script: 'git describe --tags --exact-match || echo \"\"', returnStdout: true).trim()}"    }
 
     stages {
+        stage('Validate Tag') {
+            steps {
+                script {
+                    echo "Webhook tag_name: ${env.tag_name}"
+                    echo "GIT_TAG: ${env.GIT_TAG}"
+                    if (!env.GIT_TAG) {
+                        error "No tag provided. This job only runs for tag pushes."
+                    }
+                }
+            }
+        }
+
         stage('Checkout Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
                 
                 script {
-                    echo "Webhook tag_name: ${env.tag_name}"
-                    echo "GIT_TAG: ${env.GIT_TAG}"
-                    if (env.GIT_TAG) {
-                        sh "git fetch --tags"
-                        sh "git tag -l" // In danh sách tag để debug
-                        sh "git checkout ${env.GIT_TAG}"
-                    } else {
-                        echo "No tag provided, staying on main branch"
-                    }
+                    sh "git fetch --tags"
+                    sh "git tag -l"
+                    sh "git checkout ${env.GIT_TAG}"
                 }
             }
         }
