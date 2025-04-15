@@ -4,6 +4,7 @@ pipeline {
     environment {
         NAMESPACE = "staging"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
+        GIT_TAG = sh(script: "git describe --tags --exact-match || echo ''", returnStdout: true).trim()
     }
 
     stages {
