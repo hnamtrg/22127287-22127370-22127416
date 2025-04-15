@@ -112,6 +112,8 @@ pipeline {
                         sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
                     }
 
+                    def imageTag = "${env.BRANCH_NAME}-${env.COMMIT_ID}"
+
                     def services = env.CHANGED_SERVICES.split(',')
                     services.each { service ->
                         def serviceName = "spring-petclinic-${service}"
@@ -121,17 +123,14 @@ pipeline {
                             return
                         }
                         
-                        if (BRANCH_NAME == 'main') {
-                            COMMIT_ID = "main"
-                        }
                         echo "Building Docker for ${serviceName}"
-                        sh """
+                       sh """
                             docker build \
                             --build-arg SERVICE_NAME=${serviceName} \
                             --build-arg SERVICE_PORT=${port} \
-                            -t ${DOCKER_REGISTRY}:${serviceName}-${COMMIT_ID} .
+                            -t ${DOCKER_REGISTRY}:${serviceName}-${imageTag} .
                         """
-                        sh "docker push ${DOCKER_REGISTRY}:${serviceName}-${COMMIT_ID}"
+                        sh "docker push ${DOCKER_REGISTRY}:${serviceName}-${imageTag}"
                     }
 
                     sh 'docker logout'
