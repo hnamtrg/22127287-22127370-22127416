@@ -7,14 +7,14 @@ pipeline {
     environment {
         NAMESPACE = "staging"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
-        GIT_TAG = "${env.tag_name ?: sh(script: 'git describe --tags --exact-match || echo \"\"', returnStdout: true).trim()}"    }
-
+    }
     stages {
         stage('Validate Tag') {
             steps {
                 script {
+                    def GIT_TAG = params.tag_name?.trim()
                     echo "Webhook tag_name: ${params.tag_name}"
-                    GIT_TAG = params.tag_name?.trim()
+                    echo "GIT_TAG: ${GIT_TAG}"
                     if (!GIT_TAG) {
                         error "No tag provided. This job only runs for tag pushes."
                     }
