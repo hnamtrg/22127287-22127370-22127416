@@ -12,8 +12,13 @@ pipeline {
             steps {
                 git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
                 
-                if (GIT_TAG) {
-                    sh "git checkout ${GIT_TAG}"
+                script {
+                    if (env.GIT_TAG) {
+                        sh "git fetch --tags"
+                        sh "git checkout ${env.GIT_TAG}"
+                    } else {
+                        echo "No tag provided, staying on main branch"
+                    }
                 }
             }
         }
