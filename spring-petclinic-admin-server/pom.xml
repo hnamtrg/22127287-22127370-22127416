@@ -44,8 +44,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
- 
- 
+
         <!-- Spring Boot Admin -->
         <dependency>
             <groupId>de.codecentric</groupId>
