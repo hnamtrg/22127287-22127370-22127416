@@ -18,7 +18,6 @@ pipeline {
                 }
             }
         }
-
         stage('Checkout Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
