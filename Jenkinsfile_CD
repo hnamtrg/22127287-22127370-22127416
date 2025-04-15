@@ -1,0 +1,129 @@
+pipeline {
+    agent {
+        label 'k8s-agent'
+    }
+    
+    parameters {
+        string(name: 'api_gateway', defaultValue: 'main', description: '')
+        string(name: 'customers_service', defaultValue: 'main', description: '')
+        string(name: 'vets_service', defaultValue: 'main', description: '')
+        string(name: 'visits_service', defaultValue: 'main', description: '')
+        string(name: 'admin_server', defaultValue: 'main', description: '')
+        string(name: 'discovery_server', defaultValue: 'main', description: '')
+        string(name: 'config_server', defaultValue: 'main', description: '')
+        string(name: 'genai_service', defaultValue: 'main', description: '')
+    }
+    
+    environment {
+        NAMESPACE = "developer-${BUILD_NUMBER}"
+        DOCKER_REGISTRY = 'chitaialm/petclinic'
+    }
+    
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
+            }
+        }
+
+        stage('Get Commit IDs') {
+            steps {
+                script {
+                    if (params.api_gateway != 'main') {
+                        env.API_GATEWAY_TAG = getCommitId('spring-petclinic-api-gateway', params.api_gateway)
+                    } else {
+                        env.API_GATEWAY_TAG = 'main'
+                    }
+
+                    if (params.customers_service != 'main') {
+                        env.CUSTOMERS_SERVICE_TAG = getCommitId('spring-petclinic-customers-service', params.customers_service)
+                    } else {
+                        env.CUSTOMERS_SERVICE_TAG = 'main'
+                    }
+
+                    if (params.vets_service != 'main') {
+                        env.VETS_SERVICE_TAG = getCommitId('spring-petclinic-vets-service', params.vets_service)
+                    } else {
+                        env.VETS_SERVICE_TAG = 'main'
+                    }
+
+                    if (params.visits_service != 'main') {
+                        env.VISITS_SERVICE_TAG = getCommitId('spring-petclinic-visits-service', params.visits_service)
+                    } else {
+                        env.VISITS_SERVICE_TAG = 'main'
+                    }
+
+                    if (params.admin_server != 'main') {
+                        env.ADMIN_SERVER_TAG = getCommitId('spring-petclinic-admin-server', params.admin_server)
+                    } else {
+                        env.ADMIN_SERVER_TAG = 'main'
+                    }
+
+                    if (params.discovery_server != 'main') {
+                        env.DISCOVERY_SERVER_TAG = getCommitId('spring-petclinic-discovery-server', params.discovery_server)
+                    } else {
+                        env.DISCOVERY_SERVER_TAG = 'main'
+                    }
+
+                    if (params.config_server != 'main') {
+                        env.CONFIG_SERVER_TAG = getCommitId('spring-petclinic-config-server', params.config_server)
+                    } else {
+                        env.CONFIG_SERVER_TAG = 'main'
+                    }
+
+                    if (params.genai_service != 'main') {
+                        env.GENAI_SERVICE_TAG = getCommitId('spring-petclinic-genai-service', params.genai_service)
+                    } else {
+                        env.GENAI_SERVICE_TAG = 'main'
+                    }
+                }
+            }
+        }
+        
+        stage('Create Namespace') {
+            steps {
+                sh "kubectl create namespace ${NAMESPACE}"
+                echo "Created namespace: ${NAMESPACE}"
+            }
+        }
+        
+        stage('Deploy Services') {
+            steps {
+                script {
+                    sh """
+                    helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
+                        --set namespace=${NAMESPACE} \\
+                        --set services.api-gateway.commit=${API_GATEWAY_TAG} \\
+                        --set services.customers-service.commit=${CUSTOMERS_SERVICE_TAG} \\
+                        --set services.vets-service.commit=${VETS_SERVICE_TAG} \\
+                        --set services.visits-service.commit=${VISITS_SERVICE_TAG} \\
+                        --set services.admin-server.commit=${ADMIN_SERVER_TAG} \\
+                        --set services.discovery-server.commit=${DISCOVERY_SERVER_TAG} \\
+                        --set services.config-server.commit=${CONFIG_SERVER_TAG} \\
+                        --set services.genai-service.commit=${GENAI_SERVICE_TAG}
+                    """
+                }
+            }
+        }
+
+    }
+    
+    post {
+        failure {
+            echo "Deployment failed. Cleaning up namespace ${NAMESPACE}"
+            sh "kubectl delete namespace ${NAMESPACE} || true"
+        }
+    }
+}
+
+def getCommitId(serviceName, branch) {
+    // Lấy commit ID của branch từ repository forked của bạn
+    def commitId = sh(
+        script: "git ls-remote https://github.com/Taihoclaptrinh/testtt.git refs/heads/${branch} | cut -f 1 | head -n 1",
+        returnStdout: true
+    ).trim().take(7)  // Lấy 7 ký tự đầu của commit ID
+    
+    echo "Service: ${serviceName}, Branch: ${branch}, Commit ID: ${commitId}"
+    
+    return commitId ?: branch  // Nếu không lấy được commit ID, sử dụng tên branch
+}

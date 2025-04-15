@@ -1,0 +1,87 @@
+pipeline {
+    agent { label 'k8s-agent' }
+
+    environment {
+        NAMESPACE = "staging"
+        DOCKER_REGISTRY = 'chitaialm/petclinic'
+    }
+
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
+            }
+        }
+
+        stage('Build All Docker Images for Tag') {
+            when {
+                expression { return env.GIT_TAG?.trim() }
+            }
+            steps {
+                script {
+                    def serviceMap = [
+                        'config-server': '8888',
+                        'discovery-server': '8761',
+                        'customers-service': '8081',
+                        'visits-service': '8082',
+                        'vets-service': '8083',
+                        'genai-service': '8084',
+                        'api-gateway': '8080',
+                        'admin-server': '9090'
+                    ]
+
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                    }
+
+                    serviceMap.each { service, port ->
+                        def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}-${env.GIT_TAG}"
+                        echo "Building Docker image for ${service} → ${imageName}"
+
+                        sh """
+                            docker build \
+                              --build-arg SERVICE_NAME=spring-petclinic-${service} \
+                              --build-arg SERVICE_PORT=${port} \
+                              -t ${imageName} .
+                        """
+                        sh "docker push ${imageName}"
+                    }
+                    sh "docker logout"
+                }
+            }
+        }
+
+        stage('Create Namespace') {
+            steps {
+                sh "kubectl delete namespace ${NAMESPACE} --ignore-not-found"
+                sh "kubectl create namespace ${NAMESPACE}"
+                echo "Created namespace: ${NAMESPACE}"
+            }
+        }
+        
+        stage('Deploy Services') {
+            steps {
+                script {
+                    sh """
+                    helm upgrade --install petclinic ./petclinic-chart -n ${NAMESPACE} --create-namespace \\
+                        --set namespace=${NAMESPACE} \\
+                        --set services.api-gateway.commit=${env.GIT_TAG} \\
+                        --set services.customers-service.commit=${env.GIT_TAG} \\
+                        --set services.vets-service.commit=${env.GIT_TAG} \\
+                        --set services.visits-service.commit=${env.GIT_TAG} \\
+                        --set services.admin-server.commit=${env.GIT_TAG} \\
+                        --set services.discovery-server.commit=${env.GIT_TAG} \\
+                        --set services.config-server.commit=${env.GIT_TAG} \\
+                        --set services.genai-service.commit=${env.GIT_TAG}
+                    """
+                }
+            }
+        }
+    }
+    post {
+        failure {
+            echo "Deployment failed. Cleaning up namespace ${NAMESPACE}"
+            sh "kubectl delete namespace ${NAMESPACE} || true"
+        }
+    }
+}
