@@ -29,57 +29,25 @@ pipeline {
         stage('Get Commit IDs') {
             steps {
                 script {
-                    if (params.api_gateway != 'main') {
-                        env.API_GATEWAY_TAG = getCommitId('spring-petclinic-api-gateway', params.api_gateway)
-                    } else {
-                        env.API_GATEWAY_TAG = 'main'
-                    }
+                    env.API_GATEWAY_TAG = getCommitId('spring-petclinic-api-gateway', params.api_gateway)
+    
+                    env.CUSTOMERS_SERVICE_TAG = getCommitId('spring-petclinic-customers-service', params.customers_service)
 
-                    if (params.customers_service != 'main') {
-                        env.CUSTOMERS_SERVICE_TAG = getCommitId('spring-petclinic-customers-service', params.customers_service)
-                    } else {
-                        env.CUSTOMERS_SERVICE_TAG = 'main'
-                    }
+                    env.VETS_SERVICE_TAG = getCommitId('spring-petclinic-vets-service', params.vets_service)
+                    
+                    env.VISITS_SERVICE_TAG = getCommitId('spring-petclinic-visits-service', params.visits_service)
 
-                    if (params.vets_service != 'main') {
-                        env.VETS_SERVICE_TAG = getCommitId('spring-petclinic-vets-service', params.vets_service)
-                    } else {
-                        env.VETS_SERVICE_TAG = 'main'
-                    }
+                    env.ADMIN_SERVER_TAG = getCommitId('spring-petclinic-admin-server', params.admin_server)
 
-                    if (params.visits_service != 'main') {
-                        env.VISITS_SERVICE_TAG = getCommitId('spring-petclinic-visits-service', params.visits_service)
-                    } else {
-                        env.VISITS_SERVICE_TAG = 'main'
-                    }
-
-                    if (params.admin_server != 'main') {
-                        env.ADMIN_SERVER_TAG = getCommitId('spring-petclinic-admin-server', params.admin_server)
-                    } else {
-                        env.ADMIN_SERVER_TAG = 'main'
-                    }
-
-                    if (params.discovery_server != 'main') {
-                        env.DISCOVERY_SERVER_TAG = getCommitId('spring-petclinic-discovery-server', params.discovery_server)
-                    } else {
-                        env.DISCOVERY_SERVER_TAG = 'main'
-                    }
-
-                    if (params.config_server != 'main') {
-                        env.CONFIG_SERVER_TAG = getCommitId('spring-petclinic-config-server', params.config_server)
-                    } else {
-                        env.CONFIG_SERVER_TAG = 'main'
-                    }
-
-                    if (params.genai_service != 'main') {
-                        env.GENAI_SERVICE_TAG = getCommitId('spring-petclinic-genai-service', params.genai_service)
-                    } else {
-                        env.GENAI_SERVICE_TAG = 'main'
-                    }
+                    env.DISCOVERY_SERVER_TAG = getCommitId('spring-petclinic-discovery-server', params.discovery_server)
+                    
+                    env.CONFIG_SERVER_TAG = getCommitId('spring-petclinic-config-server', params.config_server)
+                
+                    env.GENAI_SERVICE_TAG = getCommitId('spring-petclinic-genai-service', params.genai_service)
                 }
             }
         }
-        
+
         stage('Create Namespace') {
             steps {
                 sh "kubectl create namespace ${NAMESPACE}"
@@ -87,6 +55,20 @@ pipeline {
             }
         }
         
+        stage('Update Helm Values') {
+            steps {
+                script {
+                    // Cập nhật namespace
+                    sh "sed -i 's/^namespace:.*/namespace: ${NAMESPACE}/' ./petclinic-chart/values.yaml"
+
+                    // Cập nhật ingress host cho api-gateway
+                    sh "sed -i '/api-gateway:/,/host:/ s/host:.*/host: petclinic-${NAMESPACE}.tech/' ./petclinic-chart/values.yaml"
+
+                    echo "Domain: petclinic-${NAMESPACE}.tech:30213"
+                }
+            }
+        }
+
         stage('Deploy Services') {
             steps {
                 script {
@@ -105,7 +87,6 @@ pipeline {
                 }
             }
         }
-
     }
     
     post {
@@ -117,13 +98,15 @@ pipeline {
 }
 
 def getCommitId(serviceName, branch) {
-    // Lấy commit ID của branch từ repository forked của bạn
     def commitId = sh(
         script: "git ls-remote https://github.com/Taihoclaptrinh/testtt.git refs/heads/${branch} | cut -f 1 | head -n 1",
         returnStdout: true
-    ).trim().take(7)  // Lấy 7 ký tự đầu của commit ID
-    
-    echo "Service: ${serviceName}, Branch: ${branch}, Commit ID: ${commitId}"
-    
-    return commitId ?: branch  // Nếu không lấy được commit ID, sử dụng tên branch
+    ).trim().take(7)
+
+    def tag = "${branch}-${commitId ?: 'unknown'}"
+
+    echo "Service: ${serviceName}, Branch: ${branch}, Commit ID: ${commitId}, Tag: ${tag}"
+
+    return tag
 }
+
