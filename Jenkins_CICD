@@ -4,8 +4,8 @@ pipeline {
     environment {
         NAMESPACE = "staging"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
-        GIT_TAG = "${env.tag_name ?: sh(script: 'git describe --tags --exact-match || echo \"\"', returnStdout: true).trim()}"    }
-
+        GIT_TAG = "${env.tag_name}"
+    }
     stages {
         stage('Validate Tag') {
             steps {
@@ -18,7 +18,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Checkout Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
