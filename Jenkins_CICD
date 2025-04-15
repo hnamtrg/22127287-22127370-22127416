@@ -25,7 +25,7 @@ pipeline {
         stage('Checkout Repository') {
             steps {
                 script {
-                    GIT_TAG = params.tag_name?.trim()
+                    def GIT_TAG = params.tag_name?.trim()
                     git url: 'https://github.com/Taihoclaptrinh/testtt.git'
                     sh "git fetch --tags"
                     sh "git tag -l" // Debug
