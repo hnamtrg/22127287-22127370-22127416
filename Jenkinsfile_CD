@@ -99,20 +99,21 @@ pipeline {
 }
 
 def getCommitId(serviceName, branch) {
+    def cleanBranch = branch.trim()
     def commitId = sh(
-        script: "git ls-remote https://github.com/Taihoclaptrinh/testtt.git refs/heads/${branch} | cut -f 1 | head -n 1",
+        script: "git ls-remote https://github.com/Taihoclaptrinh/testtt.git refs/heads/${cleanBranch} | cut -f 1 | head -n 1",
         returnStdout: true
     ).trim().take(7)
 
-    def tag = "${branch}-${commitId}"
-    if (branch == "main") {
+    def tag = "${cleanBranch}-${commitId}"
+    if (cleanBranch == "main") {
         tag = "main"
     }
 
-    echo "Service: ${serviceName}, Branch: ${branch}, Commit ID: ${commitId}, Tag: ${tag}"
-
+    echo "Service: ${serviceName}, Branch: ${cleanBranch}, Commit ID: ${commitId}, Tag: ${tag}"
     return tag
 }
+
 
 
 
