@@ -124,7 +124,7 @@ pipeline {
 
                     services.each { svc ->
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/  commit: \\"${tag}\\"/" ${VALUES_FILE}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/(commit: .*)/    commit: "${tag}"/" ${VALUES_FILE}
                         """
                     }
                     echo "Updated commit tags to: ${tag}"
@@ -132,7 +132,22 @@ pipeline {
                 }
             }
         }
+        stage('Normalize values.yaml Indentation') {
+            steps {
+                script {
+                    def file = "${VALUES_FILE}"
 
+                    // Sử dụng sed để chuẩn hóa lại các indentation cho các mục commit
+                    sh """
+                        sed -i 's/        commit:/    commit:/' ${file}
+                        sed -i 's/    commit:/    commit:/' ${file}
+                    """
+
+                    echo "Normalized indentation in values.yaml"
+                    sh "cat ${file}"
+                }
+            }
+        }
 
 
         stage('Commit and Push to Staging') {
