@@ -45,7 +45,7 @@ services:
     port: 8080
     ingress:
       enabled: true
-      host: petclinic-staging.tech
+      host: petclinic-dev.tech
   admin-server:
     containerName: admin-server
     image: chitaialm/petclinic
