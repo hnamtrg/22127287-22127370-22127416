@@ -82,16 +82,25 @@ pipeline {
                         sed -i 's/commit:.*/commit: ${tag}/g' ${VALUES_FILE}
                     """
                     echo "Updated values.yaml with tag ${tag}"
+                    sh """
+                        sed -i 's/namespace: .*/namespace: ${NAMESPACE}/g' ${VALUES_FILE}
+                    """
+                    echo "Updated values.yaml with namespace: ${NAMESPACE}"
+                    
+                    sh "cat ${VALUES_FILE}"
                 }
             }
         }
+
 
         stage('Update Application Namespace') {
             steps {
                 script {
                     sh "sed -i '/destination:/,/namespace:/s/namespace: .*/namespace: ${NAMESPACE}/' ${APPLICATION_FILE}"
                     echo "Updated application.yaml with namespace: ${NAMESPACE}"
+                    sh "cat application.yaml"
                 }
+
             }
         }
 
