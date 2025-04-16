@@ -128,11 +128,10 @@ pipeline {
 
                     // Update commit tag cho từng service trong values.yaml
                     services.each { svc ->
-                        sh """
-                            sed -i '/${svc}:$/,/commit:/s/commit: .*/commit: "${tag}"/' ${VALUES_FILE}
-                        """
+                        sh '''
+                            sed -i "/''' + svc + ''':$/,/commit:/s/commit: .*/commit: \\"''' + tag + '\\"/" ''' + VALUES_FILE + '''
+                        '''
                     }
-
                     // Ghi log kết quả
                     echo "Updated commit tags to: ${tag}"
                     sh "cat ${VALUES_FILE}"
