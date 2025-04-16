@@ -106,7 +106,6 @@ pipeline {
             }
         }
 
-
         stage('Update values.yaml with Commit Tag') {
             steps {
                 script {
@@ -125,12 +124,10 @@ pipeline {
 
                     services.each { svc ->
                         sh """
-                            sed -i '/${svc}:$/,/commit:/s/commit: .*/    commit: \"${tag}\"/' ${VALUES_FILE}
+                            sed -i '/${svc}\\\:$/,/commit:/s/commit: .*/    commit: \"${tag}\"/' ${VALUES_FILE}
                         """
                     }
-
-
-                    echo "✅ Updated commit tags to: ${tag}"
+                    echo "Updated commit tags to: ${tag}"
                     sh "cat ${file}"
                 }
             }
