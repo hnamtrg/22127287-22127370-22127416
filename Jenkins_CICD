@@ -124,11 +124,10 @@ pipeline {
 
                     services.each { svc ->
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^\([[:space:]]*\)commit: .*/  \1commit: \"${tag}\"/" ${VALUES_FILE}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/(commit: .*)/    commit: "${tag}"/" ${VALUES_FILE}
                         """
                     }
-
-                    echo "✅ Updated commit tags to: ${tag}"
+                    echo "Updated commit tags to: ${tag}"
                     sh "cat ${file}"
                 }
             }
