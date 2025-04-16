@@ -96,19 +96,16 @@ pipeline {
         stage('Checkout to Staging') {
             steps {
                 script {
-                    // Lưu lại tag đang dùng
-                    def tag = params.tag_name?.trim()
-
-                    // Reset và checkout sang nhánh staging
                     sh """
-                        git reset --hard
-                        git clean -fd
+                        git fetch origin
                         git checkout staging
-                        git pull origin staging
+                        git reset --hard origin/staging
+                        git clean -fd
                     """
                 }
             }
         }
+
 
         stage('Update values.yaml with Commit Tag') {
             steps {
