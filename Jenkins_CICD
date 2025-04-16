@@ -11,6 +11,7 @@ pipeline {
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
         APPLICATION_FILE = "application.yaml"
+        COMMIT = "${params.tag_name?.trim()}" 
     }
 
     stages {
@@ -74,42 +75,65 @@ pipeline {
         //     }
         // }
 
-        stage('Update values.yaml') {
-            steps {
-                script {
-                    def tag = params.tag_name?.trim()
-                    sh """
-                        sed -i 's/commit:.*/commit: ${tag}/g' ${VALUES_FILE}
-                    """
-                    echo "Updated values.yaml with tag ${tag}"
-                    sh """
-                        sed -i 's/namespace: .*/namespace: ${NAMESPACE}/g' ${VALUES_FILE}
-                    """
-                    echo "Updated values.yaml with namespace: ${NAMESPACE}"
+        // stage('Update values.yaml') {
+        //     steps {
+        //         script {
+        //             def tag = params.tag_name?.trim()
+        //             sh """
+        //                 sed -i 's/commit:.*/commit: ${tag}/g' ${VALUES_FILE}
+        //             """
+        //             echo "Updated values.yaml with tag ${tag}"
+        //             sh """
+        //                 sed -i 's/namespace: .*/namespace: ${NAMESPACE}/g' ${VALUES_FILE}
+        //             """
+        //             echo "Updated values.yaml with namespace: ${NAMESPACE}"
                     
-                    sh "cat ${VALUES_FILE}"
-                }
-            }
-        }
-        
+        //             sh "cat ${VALUES_FILE}"
+        //         }
+        //     }
+        // }
 
-        stage('Update Application Namespace') {
+
+        // stage('Update Application Namespace') {
+        //     steps {
+        //         script {
+        //             sh "sed -i '/destination:/,/namespace:/s/namespace: .*/namespace: ${NAMESPACE}/' ${APPLICATION_FILE}"
+        //             echo "Updated application.yaml with namespace: ${NAMESPACE}"
+        //             sh "cat application.yaml"
+        //         }
+
+        //     }
+        // }
+
+
+        // stage('Apply ArgoCD Application') {
+        //     steps {
+        //         script {
+        //             echo "Applying latest application.yaml regardless of existence"
+        //             sh "kubectl apply -f ${APPLICATION_FILE}"
+        //         }
+        //     }
+        // }
+
+        stage('Update Application File') {
             steps {
                 script {
-                    sh "sed -i '/destination:/,/namespace:/s/namespace: .*/namespace: ${NAMESPACE}/' ${APPLICATION_FILE}"
-                    echo "Updated application.yaml with namespace: ${NAMESPACE}"
-                    sh "cat application.yaml"
+                    sh """
+                        export COMMIT=${COMMIT}
+                        export NAMESPACE=${NAMESPACE}
+                        envsubst < ${APPLICATION_FILE} > application-temp.yaml
+                    """
+                    echo "Updated application.yaml with COMMIT: ${COMMIT} and namespace: ${NAMESPACE}"
+                    sh "cat application-temp.yaml"
                 }
-
             }
         }
-
 
         stage('Apply ArgoCD Application') {
             steps {
                 script {
                     echo "Applying latest application.yaml regardless of existence"
-                    sh "kubectl apply -f ${APPLICATION_FILE}"
+                    sh "kubectl apply -f application-temp.yaml"
                 }
             }
         }
