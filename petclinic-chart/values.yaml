@@ -5,6 +5,7 @@ services:
     containerName: config-server
     image: chitaialm/petclinic
     tag: spring-petclinic-config-server
+    
     commit: ""
     port: 8888
   customers-service:

@@ -124,8 +124,7 @@ pipeline {
 
                     services.each { svc ->
                         sh """
-                            sed -i "/${svc}/,/commit:/s/\\( *commit: \\).*/\\1\\"${tag}\\"/" ${VALUES_FILE}
-
+                            sed -i "/^  ${svc}:\\$/,/^[[:space:]]*[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${tag}\\"/" ${VALUES_FILE}
                         """
                     }
 
