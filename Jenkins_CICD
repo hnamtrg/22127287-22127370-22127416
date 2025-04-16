@@ -99,15 +99,16 @@ pipeline {
         stage('Check Application Existence') {
             steps {
                 script {
-                    def appExists = sh(
+                    def output = sh(
                         script: "kubectl get application ${APP_NAME} -n argocd --ignore-not-found",
-                        returnStatus: true
-                    ) == 0
+                        returnStdout: true
+                    ).trim()
 
-                    if (!appExists) {
+                    if (!output) {
                         echo "Application ${APP_NAME} does not exist. Creating new application..."
                         sh "kubectl apply -f ${APPLICATION_FILE}"
                     } else {
+                        echo "Found existing application:\n${output}"
                         echo "Application ${APP_NAME} already exists. Skipping apply."
                     }
                 }
