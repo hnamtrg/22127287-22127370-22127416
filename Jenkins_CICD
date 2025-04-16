@@ -89,7 +89,7 @@ pipeline {
         stage('Update Application Namespace') {
             steps {
                 script {
-                    sh "sed -i 's/namespace: .*/namespace: ${NAMESPACE}/g' ${APPLICATION_FILE}"
+                    sh "sed -i '/destination:/,/namespace:/s/namespace: .*/namespace: ${NAMESPACE}/' ${APPLICATION_FILE}"
                     echo "Updated application.yaml with namespace: ${NAMESPACE}"
                 }
             }
