@@ -10,7 +10,7 @@ pipeline {
         DOCKER_REGISTRY = 'chitaialm/petclinic'
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
-        APPLICATION_FILE = "petclinic-chart/application.yaml"
+        APPLICATION_FILE = "application.yaml"
     }
 
     stages {
@@ -38,41 +38,41 @@ pipeline {
             }
         }
 
-        stage('Build and Push Docker Images') {
-            steps {
-                script {
-                    def serviceMap = [
-                        'config-server': '8888',
-                        'discovery-server': '8761',
-                        'customers-service': '8081',
-                        'visits-service': '8082',
-                        'vets-service': '8083',
-                        'genai-service': '8084',
-                        'api-gateway': '8080',
-                        'admin-server': '9090'
-                    ]
+        // stage('Build and Push Docker Images') {
+        //     steps {
+        //         script {
+        //             def serviceMap = [
+        //                 'config-server': '8888',
+        //                 'discovery-server': '8761',
+        //                 'customers-service': '8081',
+        //                 'visits-service': '8082',
+        //                 'vets-service': '8083',
+        //                 'genai-service': '8084',
+        //                 'api-gateway': '8080',
+        //                 'admin-server': '9090'
+        //             ]
 
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
-                    }
+        //             withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        //                 sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+        //             }
 
-                    serviceMap.each { service, port ->
-                        def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}-${params.tag_name}"
-                        echo "Building Docker image for ${service} → ${imageName}"
+        //             serviceMap.each { service, port ->
+        //                 def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}-${params.tag_name}"
+        //                 echo "Building Docker image for ${service} → ${imageName}"
 
-                        sh """
-                            docker build \
-                              --build-arg SERVICE_NAME=spring-petclinic-${service} \
-                              --build-arg SERVICE_PORT=${port} \
-                              -t ${imageName} .
-                        """
-                        sh "docker push ${imageName}"
-                    }
+        //                 sh """
+        //                     docker build \
+        //                       --build-arg SERVICE_NAME=spring-petclinic-${service} \
+        //                       --build-arg SERVICE_PORT=${port} \
+        //                       -t ${imageName} .
+        //                 """
+        //                 sh "docker push ${imageName}"
+        //             }
 
-                    sh "docker logout"
-                }
-            }
-        }
+        //             sh "docker logout"
+        //         }
+        //     }
+        // }
 
         stage('Update values.yaml') {
             steps {
@@ -85,7 +85,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Update Application Namespace') {
             steps {
                 script {
