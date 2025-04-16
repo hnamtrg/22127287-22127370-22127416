@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        NAMESPACE = "dev"
+        NAMESPACE = "staging"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
@@ -93,47 +93,64 @@ pipeline {
         //     }
         // }
 
-
-        // stage('Update Application Namespace') {
-        //     steps {
-        //         script {
-        //             sh "sed -i '/destination:/,/namespace:/s/namespace: .*/namespace: ${NAMESPACE}/' ${APPLICATION_FILE}"
-        //             echo "Updated application.yaml with namespace: ${NAMESPACE}"
-        //             sh "cat application.yaml"
-        //         }
-
-        //     }
-        // }
-
-
-        // stage('Apply ArgoCD Application') {
-        //     steps {
-        //         script {
-        //             echo "Applying latest application.yaml regardless of existence"
-        //             sh "kubectl apply -f ${APPLICATION_FILE}"
-        //         }
-        //     }
-        // }
-
-        stage('Update Application File') {
+        stage('Checkout to Staging') {
             steps {
                 script {
+                    // Lưu lại tag đang dùng
+                    def tag = params.tag_name?.trim()
+
+                    // Reset và checkout sang nhánh staging
                     sh """
-                        export COMMIT=${COMMIT}
-                        export NAMESPACE=${NAMESPACE}
-                        envsubst < ${APPLICATION_FILE} > application-temp.yaml
+                        git reset --hard
+                        git clean -fd
+                        git checkout staging
+                        git pull origin staging
                     """
-                    echo "Updated application.yaml with COMMIT: ${COMMIT} and namespace: ${NAMESPACE}"
-                    sh "cat application-temp.yaml"
                 }
             }
         }
 
-        stage('Apply ArgoCD Application') {
+        stage('Update values.yaml with Commit Tag') {
             steps {
                 script {
-                    echo "Applying latest application.yaml regardless of existence"
-                    sh "kubectl apply -f application-temp.yaml"
+                    def tag = params.tag_name?.trim()
+                    
+                    def services = [
+                        'config-server',
+                        'customers-service',
+                        'discovery-server',
+                        'visits-service',
+                        'vets-service',
+                        'genai-service',
+                        'api-gateway',
+                        'admin-server'
+                    ]
+
+                    // Update commit tag cho từng service trong values.yaml
+                    services.each { svc ->
+                        sh """
+                            sed -i '/${svc}:$/,/commit:/s/commit: .*/commit: "${tag}"/' ${VALUES_FILE}
+                        """
+                    }
+
+                    // Ghi log kết quả
+                    echo "Updated commit tags to: ${tag}"
+                    sh "cat ${VALUES_FILE}"
+                }
+            }
+        }
+
+        stage('Commit and Push to Staging') {
+            steps {
+                script {
+                    def tag = params.tag_name?.trim()
+                    sh """
+                        git config user.email "lamchitaia1@gmail.com"
+                        git config user.name "Taihoclaptrinh"
+                        git add ${VALUES_FILE}
+                        git commit -m "chore: update commit tag to ${tag} [skip ci]" || echo "No changes to commit"
+                        git push origin staging
+                    """
                 }
             }
         }
