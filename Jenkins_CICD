@@ -114,7 +114,7 @@ pipeline {
             steps {
                 script {
                     def tag = params.tag_name?.trim()
-                    
+                    def file = "${VALUES_FILE}"
                     def services = [
                         'config-server',
                         'customers-service',
@@ -126,18 +126,18 @@ pipeline {
                         'admin-server'
                     ]
 
-                    // Update commit tag cho từng service trong values.yaml
                     services.each { svc ->
-                        sh '''
-                            sed -i "/''' + svc + ''':$/,/commit:/s/commit: .*/commit: \\"''' + tag + '\\"/" ''' + VALUES_FILE + '''
-                        '''
+                        // echo để debug xem svc và file được truyền đúng không
+                        echo "Updating commit tag for service: ${svc}"
+                        sh "sed -i '/${svc}:\\\$/,/commit:/s/commit: .*/commit: \"${tag}\"/' ${file}"
                     }
-                    // Ghi log kết quả
-                    echo "Updated commit tags to: ${tag}"
-                    sh "cat ${VALUES_FILE}"
+
+                    echo "✅ Updated commit tags to: ${tag}"
+                    sh "cat ${file}"
                 }
             }
         }
+
 
         stage('Commit and Push to Staging') {
             steps {
