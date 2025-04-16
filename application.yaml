@@ -30,7 +30,7 @@ spec:
             commit: ${COMMIT}
   destination:
     server: https://kubernetes.default.svc
-    namespace: staging
+    namespace: ${NAMESPACE}
   syncPolicy:
     automated:
       prune: true
