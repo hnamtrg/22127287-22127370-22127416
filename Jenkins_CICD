@@ -142,7 +142,7 @@ pipeline {
                     def tag = params.tag_name?.trim()
                     
                     // Sử dụng GitHub token để đăng nhập vào git
-                    withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'token-github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         sh """
                             git config user.email "lamchitaia1@gmail.com"
                             git config user.name "Taihoclaptrinh"
