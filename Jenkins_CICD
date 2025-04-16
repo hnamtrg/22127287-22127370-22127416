@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        NAMESPACE = "staging"
+        NAMESPACE = "dev"
         DOCKER_REGISTRY = 'chitaialm/petclinic'
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
