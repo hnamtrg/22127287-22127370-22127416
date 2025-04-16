@@ -137,13 +137,15 @@ pipeline {
                 script {
                     def file = "${VALUES_FILE}"
 
-                    // Sử dụng sed để chuẩn hóa lại các indentation cho các mục commit
                     sh """
+
                         sed -i 's/        commit:/    commit:/' ${file}
                         sed -i 's/    commit:/    commit:/' ${file}
+
+                        sed -i 's/    commit:/        commit:/' ${file}
                     """
 
-                    echo "Normalized indentation in values.yaml"
+                    echo " Normalized indentation and added extra indent to commit in values.yaml"
                     sh "cat ${file}"
                 }
             }
