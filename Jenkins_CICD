@@ -124,9 +124,9 @@ pipeline {
                     ]
 
                     services.each { svc ->
-                        // echo để debug xem svc và file được truyền đúng không
-                        echo "Updating commit tag for service: ${svc}"
-                        sh "sed -i '/${svc}:\\\$/,/commit:/s/commit: .*/commit: \"${tag}\"/' ${file}"
+                        sh """
+                            sed -i '/${svc}/,/commit:/s/commit: .*/    commit: "${tag}"/' ${VALUES_FILE}
+                        """
                     }
 
                     echo "✅ Updated commit tags to: ${tag}"
