@@ -118,26 +118,22 @@ pipeline {
         stage('Commit and Push to Staging') {
             steps {
                 script {
-                    def tag = params.tag_name?.trim()
-                    
-                    // Sử dụng GitHub token để đăng nhập vào git
                     withCredentials([usernamePassword(credentialsId: 'token-github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                         sh """
                             git config user.email "lamchitaia1@gmail.com"
                             git config user.name "Taihoclaptrinh"
                             git add ${VALUES_FILE}
-                            git commit -m "chore: update commit tag to ${tag} [skip ci]" || echo "No changes to commit"
-                            
+                            git commit -m "chore: update commit tag to ${env.COMMIT} [skip ci]" || echo "No changes to commit"
+
                             # Đặt lại remote URL với GitHub token
-                            git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/Taihoclaptrinh/testtt.git
-                            
+                            git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/hnamtrg/22127287-22127370-22127416.git
+
                             # Push code lên branch staging
-                            git push origin staging
+                            git push origin ${env.NAMESPACE}
                         """
                     }
                 }
             }
         }
-
     }
 }

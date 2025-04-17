@@ -22,7 +22,7 @@ pipeline {
     stages {
         stage('Checkout Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Taihoclaptrinh/testtt.git'
+                git branch: 'main', url: 'https://github.com/hnamtrg/22127287-22127370-22127416.git'
             }
         }
 
@@ -108,7 +108,7 @@ pipeline {
 def getCommitId(serviceName, branch) {
     def cleanBranch = branch.trim()
     def commitId = sh(
-        script: "git ls-remote https://github.com/Taihoclaptrinh/testtt.git refs/heads/${cleanBranch} | cut -f 1 | head -n 1",
+        script: "git ls-remote https://github.com/hnamtrg/22127287-22127370-22127416.git refs/heads/${cleanBranch} | cut -f 1 | head -n 1",
         returnStdout: true
     ).trim().take(7)
 
