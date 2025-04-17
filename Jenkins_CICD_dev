@@ -18,7 +18,6 @@ pipeline {
                     sh "git fetch --all"
                     sh "git checkout main"
                     sh "git pull" // Đảm bảo cập nhật nhánh
-                    echo ${env.COMMIT}
                 }
             }
         }
