@@ -16,12 +16,11 @@ pipeline {
             steps {
                 script {
                     sh "git fetch --all"
-                    sh "git pull origin main" // Đảm bảo cập nhật nhánh
                     sh "git checkout main"
+                    sh "git pull origin main" // Đảm bảo cập nhật nhánh
                 }
             }
         }
-
 
         stage('Get Commit Hash') {
             steps {
