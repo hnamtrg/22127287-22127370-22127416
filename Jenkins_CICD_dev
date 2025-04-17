@@ -26,13 +26,12 @@ pipeline {
             steps {
                 script {
                     // Lấy commit hash
-                    env.COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.COMMIT = "v0.1.5"
                     echo "Commit hash: ${env.COMMIT}"
                 }
             }
         }
         
-
         // stage('Build and Push Docker Images') {
         //     steps {
         //         script {
@@ -99,10 +98,10 @@ pipeline {
 
                     // Đặt imageTag trong vòng lặp để mỗi service có một giá trị riêng
                     services.each { svc ->
-                        def imageTag = "spring-petclinic-${svc}-${env.COMMIT}" // Đặt imageTag cho mỗi service
+                        // def imageTag = "spring-petclinic-${svc}-${env.COMMIT}" // Đặt imageTag cho mỗi service
 
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${imageTag}\\"/" ${file}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${env.COMMIT}\\"/" ${file}
                         """
                     }
 
