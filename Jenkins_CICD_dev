@@ -120,8 +120,12 @@ pipeline {
                             git config user.name "Taihoclaptrinh"
                             git add ${VALUES_FILE}
                             git commit -m "chore: update commit tag to ${env.COMMIT} [skip ci]" || echo "No changes to commit"
+
+                            # Đặt lại remote URL với GitHub token
                             git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/Taihoclaptrinh/testtt.git
-                            git push origin staging
+
+                            # Push code lên branch staging
+                            git push origin ${env.NAMESPACE}
                         """
                     }
                 }
