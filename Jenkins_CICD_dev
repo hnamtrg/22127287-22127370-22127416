@@ -26,7 +26,9 @@ pipeline {
             steps {
                 script {
                     // Lấy commit hash
-                    env.COMMIT = "v0.1.5"
+                    env.COMMIT = "main"
+                    // env.COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+
                     echo "Commit hash: ${env.COMMIT}"
                 }
             }
@@ -98,7 +100,7 @@ pipeline {
 
                     // Đặt imageTag trong vòng lặp để mỗi service có một giá trị riêng
                     services.each { svc ->
-                        // def imageTag = "spring-petclinic-${svc}-${env.COMMIT}" // Đặt imageTag cho mỗi service
+                        // def imageTag = "${env.BRANCH_NAME}-${env.COMMIT}" // Đặt imageTag cho mỗi service
 
                         sh """
                             sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${env.COMMIT}\\"/" ${file}
