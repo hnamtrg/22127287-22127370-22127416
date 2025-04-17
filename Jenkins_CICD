@@ -140,8 +140,6 @@ pipeline {
                     sh """
 
                         sed -i 's/        commit:/    commit:/' ${file}
-                        sed -i 's/    commit:/    commit:/' ${file}
-
                         sed -i 's/    commit:/        commit:/' ${file}
                     """
 
