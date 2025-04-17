@@ -1,0 +1,126 @@
+pipeline {
+    agent { label 'k8s-agent' }
+
+    environment {
+        NAMESPACE = "dev"
+        DOCKER_REGISTRY = 'chitaialm/petclinic'
+        APP_NAME = "petclinic-${NAMESPACE}"
+        VALUES_FILE = "petclinic-chart/values.yaml"
+        APPLICATION_FILE = "application.yaml"
+        COMMIT = "" // sẽ gán trong stage
+    }
+
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                script {
+                    sh "git fetch --all"
+                    sh "git checkout ${env.BRANCH_NAME}"
+                }
+            }
+        }
+
+        stage('Get Commit Hash') {
+            steps {
+                script {
+                    // env.COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    env.COMMIT = "v0.1.5"
+                    echo "Commit hash: ${env.COMMIT}"
+                }
+            }
+        }
+
+        // stage('Build and Push Docker Images') {
+        //     steps {
+        //         script {
+        //             def serviceMap = [
+        //                 'config-server': '8888',
+        //                 'discovery-server': '8761',
+        //                 'customers-service': '8081',
+        //                 'visits-service': '8082',
+        //                 'vets-service': '8083',
+        //                 'genai-service': '8084',
+        //                 'api-gateway': '8080',
+        //                 'admin-server': '9090'
+        //             ]
+
+        //             withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        //                 sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+        //             }
+
+        //             serviceMap.each { service, port ->
+        //                 def imageName = "${DOCKER_REGISTRY}:spring-petclinic-${service}--${env.BRANCH_NAME}-${env.COMMIT}"
+        //                 echo "Building Docker image for ${service} → ${imageName}"
+
+        //                 sh """
+        //                     docker build \
+        //                       --build-arg SERVICE_NAME=spring-petclinic-${service} \
+        //                       --build-arg SERVICE_PORT=${port} \
+        //                       -t ${imageName} .
+        //                 """
+        //                 sh "docker push ${imageName}"
+        //             }
+
+        //             sh "docker logout"
+        //         }
+        //     }
+        // }
+
+        stage('Checkout to Staging') {
+            steps {
+                script {
+                    sh """
+                        git fetch origin
+                        git checkout ${env.NAMESPACE}
+                        git reset --hard origin/${env.NAMESPACE}
+                        git clean -fd
+                    """
+                }
+            }
+        }
+
+        stage('Update values.yaml with Commit') {
+            steps {
+                script {
+                    def file = "${VALUES_FILE}"
+                    def services = [
+                        'config-server',
+                        'customers-service',
+                        'discovery-server',
+                        'visits-service',
+                        'vets-service',
+                        'genai-service',
+                        'api-gateway',
+                        'admin-server'
+                    ]
+                    // def imageTag = "spring-petclinic-${svc}--${env.BRANCH_NAME}-${env.COMMIT}"
+                    def imageTag = "spring-petclinic-${svc}-${env.COMMIT}"
+                    services.each { svc ->
+                        sh """
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${imageTag}\\"/" ${VALUES_FILE}
+                        """
+                    }
+                    echo "Updated commit tags to: ${imageTag}"
+                    sh "cat ${file}"
+                }
+            }
+        }
+
+        stage('Commit and Push to Staging') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'token-github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh """
+                            git config user.email "lamchitaia1@gmail.com"
+                            git config user.name "Taihoclaptrinh"
+                            git add ${VALUES_FILE}
+                            git commit -m "chore: update commit tag to ${env.COMMIT} [skip ci]" || echo "No changes to commit"
+                            git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/Taihoclaptrinh/testtt.git
+                            git push origin staging
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
