@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: petclinic
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Taihoclaptrinh/testtt
+    path: petclinic-chart
+    targetRevision: main
+    helm:
+      values: |
+        services:
+          config-server:
+            commit: ${COMMIT}
+          discovery-server:
+            commit: ${COMMIT}
+          customers-service:
+            commit: ${COMMIT}
+          visits-service:
+            commit: ${COMMIT}
+          vets-service:
+            commit: ${COMMIT}
+          genai-service:
+            commit: ${COMMIT}
+          api-gateway:
+            commit: ${COMMIT}
+          admin-server:
+            commit: ${COMMIT}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ${NAMESPACE}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
