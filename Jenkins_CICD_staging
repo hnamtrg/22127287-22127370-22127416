@@ -71,8 +71,8 @@ pipeline {
                 //     }
 
                 //     sh "docker logout"
-                // }
-                echo "Build successfully."
+                    echo "Build successfully."
+                }
             }
         }
 
