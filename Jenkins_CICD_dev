@@ -25,11 +25,8 @@ pipeline {
         stage('Get Commit Hash') {
             steps {
                 script {
+                    sh "git rev-parse --short HEAD"  // Kiểm tra HEAD hiện tại
                     env.COMMIT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    // env.COMMIT = "v0.1.5"
-                    if (!env.COMMIT) {
-                        error "No commit found in the repository"
-                    }
                     echo "Commit hash: ${env.COMMIT}"
                 }
             }
