@@ -7,8 +7,7 @@ pipeline {
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
         APPLICATION_FILE = "application.yaml"
-        COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-
+        // COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
         BRANCH_NAME = 'main'
     }
 
@@ -24,6 +23,15 @@ pipeline {
             }
         }
 
+        stage('Get Commit Hash') {
+            steps {
+                script {
+                    // Lấy commit hash
+                    env.COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    echo "Commit hash: ${env.COMMIT}"
+                }
+            }
+        }
         
 
         // stage('Build and Push Docker Images') {
