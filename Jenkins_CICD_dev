@@ -8,6 +8,7 @@ pipeline {
         VALUES_FILE = "petclinic-chart/values.yaml"
         APPLICATION_FILE = "application.yaml"
         COMMIT = "" // sẽ gán trong stage
+        BRANCH_NAME = 'main'
     }
 
     stages {
