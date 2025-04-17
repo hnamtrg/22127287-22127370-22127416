@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Taihoclaptrinh/testtt
+    repoURL: https://github.com/hnamtrg/22127287-22127370-22127416
     path: petclinic-chart
     targetRevision: staging
   destination:
