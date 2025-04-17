@@ -7,7 +7,8 @@ pipeline {
         APP_NAME = "petclinic-${NAMESPACE}"
         VALUES_FILE = "petclinic-chart/values.yaml"
         APPLICATION_FILE = "application.yaml"
-        COMMIT = "" // sẽ gán trong stage
+        COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+
         BRANCH_NAME = 'main'
     }
 
@@ -18,20 +19,12 @@ pipeline {
                     sh "git fetch --all"
                     sh "git checkout main"
                     sh "git pull origin main" // Đảm bảo cập nhật nhánh
+                    echo ${env.COMMIT}
                 }
             }
         }
 
-        stage('Get Commit Hash') {
-            steps {
-                script {
-                    sh "git rev-parse --short HEAD"  // Kiểm tra HEAD hiện tại
-                    commitHash   = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    env.COMMIT = commitHash
-                    echo "Commit hash: ${env.COMMIT}"
-                }
-            }
-        }
+        
 
         // stage('Build and Push Docker Images') {
         //     steps {
