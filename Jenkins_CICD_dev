@@ -94,18 +94,22 @@ pipeline {
                         'api-gateway',
                         'admin-server'
                     ]
-                    // def imageTag = "spring-petclinic-${svc}--${env.BRANCH_NAME}-${env.COMMIT}"
-                    def imageTag = "spring-petclinic-${svc}-${env.COMMIT}"
+
+                    // Đặt imageTag trong vòng lặp để mỗi service có một giá trị riêng
                     services.each { svc ->
+                        def imageTag = "spring-petclinic-${svc}-${env.COMMIT}" // Đặt imageTag cho mỗi service
+
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${imageTag}\\"/" ${VALUES_FILE}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${imageTag}\\"/" ${file}
                         """
                     }
-                    echo "Updated commit tags to: ${imageTag}"
+
+                    echo "Updated commit tags to include service and commit"
                     sh "cat ${file}"
                 }
             }
         }
+
 
         stage('Commit and Push to Staging') {
             steps {
