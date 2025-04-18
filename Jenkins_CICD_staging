@@ -92,7 +92,7 @@ pipeline {
             steps {
                 script {
                     def tag = params.tag_name?.trim()
-                    def tag1 = "main"
+                    // def tag1 = "main"
                     def file = "${VALUES_FILE}"
                     def services = [
                         'config-server',
@@ -107,7 +107,7 @@ pipeline {
 
                     services.each { svc ->
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${tag1}\\"/" ${VALUES_FILE}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${tag}\\"/" ${VALUES_FILE}
                         """
                     }
                     echo "Updated commit tags to: ${tag}"
