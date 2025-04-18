@@ -105,7 +105,7 @@ pipeline {
                     services.each { svc ->
                          // Đặt imageTag cho mỗi service
                         sh """
-                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${imageTag}\\"/" ${file}
+                            sed -i "/^  ${svc}:/,/^[^[:space:]]/s/^[[:space:]]*commit: .*/    commit: \\"${env.COMMIT}\\"/" ${file}
                         """
                     }
 
