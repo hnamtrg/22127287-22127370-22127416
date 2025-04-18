@@ -97,7 +97,6 @@ services:
     ports:
      - 8084:8084
 
-
   api-gateway:
     image: springcommunity/spring-petclinic-api-gateway
     container_name: api-gateway
