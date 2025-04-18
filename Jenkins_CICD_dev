@@ -26,8 +26,8 @@ pipeline {
             steps {
                 script {
                     // Lấy commit hash
-                    // env.COMMIT = "v0.1.5"
-                    env.COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.COMMIT = "v0.1.5"
+                    // env.COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
 
                     echo "Commit hash: ${env.COMMIT}"
                 }
